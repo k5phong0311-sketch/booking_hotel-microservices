@@ -442,4 +442,4 @@ Tất cả request đều đi qua `API Gateway` tại `http://localhost:3000`.
 
 ---
 
-<p align="center">Made with ❤️ by Group TheLiemVietNam </p>
+<p align="center">Made with ❤️ by Group 10 </p>
