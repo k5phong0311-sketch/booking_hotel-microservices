@@ -404,13 +404,13 @@ Tất cả request đều đi qua `API Gateway` tại `http://localhost:3000`.
 
 ## 👥 Thành viên nhóm
 
-| Thành viên | Service phụ trách | Branch |
-|:---|:---|:---|
-| Truong Van Phong | API Gateway & Review Service | `feat/api-gateway` |
-| Tran Duc Hai | User & Auth Service | `feat/user-auth` |
-| Nguyen Thanh Hung | Room Catalog Service | `feat/room-catalog` |
-| Bui Dai Duong | Booking Service | `feat/booking-service` |
-| Dau Ngoc Anh | Payment & Notification Service | `feat/payment-notification` |
+| Họ tên | Email | Service phụ trách | Branch |
+|:---|:---|:---|:---|
+| Trương Văn Phong | k5phong0311@gmail.com | API Gateway & Review Service | `feat/api-gateway` |
+| Trần Đức Hải | 2311060742@hunre.edu.vn | User & Auth Service | `feat/user-auth` |
+| Nguyễn Thành Hưng | 2311060608@hunre.edu.vn | Room Catalog Service | `feat/room-catalog` |
+| Bùi Đại Dương | 2311060706@hunre.edu.vn | Booking Service | `feat/booking-service` |
+| Đậu Ngọc Anh | daungocanh90@gmail.com | Payment & Notification Service | `feat/payment-notification` |
 
 ---
 
