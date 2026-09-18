@@ -75,7 +75,7 @@ Hệ thống đặt phòng khách sạn được xây dựng theo kiến trúc *
 ## 📦 Danh sách Microservices
 
 ### 1. 🔀 API Gateway + Review Service — `Port: 3000`
-**Người phụ trách:** _(Thành viên 1)_
+**Người phụ trách:** _(Truong Van Phong)_
 
 - Nhận toàn bộ request từ Client React
 - Xác thực JWT Token (gọi User Service hoặc tự verify)
@@ -86,7 +86,7 @@ Hệ thống đặt phòng khách sạn được xây dựng theo kiến trúc *
 ---
 
 ### 2. 👤 User & Auth Service — `Port: 3001`
-**Người phụ trách:** _(Thành viên 2)_
+**Người phụ trách:** _(Tran Duc Hai)_
 
 - Đăng ký tài khoản mới (`POST /auth/register`)
 - Đăng nhập và cấp phát JWT Access Token (`POST /auth/login`)
@@ -96,7 +96,7 @@ Hệ thống đặt phòng khách sạn được xây dựng theo kiến trúc *
 ---
 
 ### 3. 🏠 Room Catalog Service — `Port: 3002`
-**Người phụ trách:** _(Thành viên 3)_
+**Người phụ trách:** _(Nguyen Thanh Hung)_
 
 - Quản lý danh mục phòng (thêm/sửa/xóa phòng)
 - Xem danh sách phòng theo loại, giá, tầng
@@ -107,7 +107,7 @@ Hệ thống đặt phòng khách sạn được xây dựng theo kiến trúc *
 ---
 
 ### 4. 📅 Booking Service — `Port: 3003`
-**Người phụ trách:** _(Thành viên 4)_
+**Người phụ trách:** _(Bui Dai Duong)_
 
 - Tạo đơn đặt phòng mới (gọi Room Service để kiểm tra phòng trống)
 - Quản lý vòng đời đơn đặt phòng: `PENDING` → `CONFIRMED` / `FAILED` / `CANCELED`
@@ -118,7 +118,7 @@ Hệ thống đặt phòng khách sạn được xây dựng theo kiến trúc *
 ---
 
 ### 5. 💳 Payment & Notification Service — `Port: 3004`
-**Người phụ trách:** _(Thành viên 5)_
+**Người phụ trách:** _(Dau Ngoc Anh)_
 
 - Xử lý thanh toán (giả lập hoặc tích hợp cổng thanh toán)
 - Gọi ngược lại Booking Service để cập nhật trạng thái sau khi thanh toán
