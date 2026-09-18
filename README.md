@@ -6,6 +6,34 @@ Hệ thống đặt phòng khách sạn được xây dựng theo kiến trúc *
 
 ---
 
+## 🚧 Tiến độ dự án
+
+> **Ghi chú:** Section này dùng để theo dõi tiến độ trong quá trình phát triển. Sẽ được xóa khi dự án hoàn thiện.
+
+| Service | Người phụ trách | Branch | Base Code | CRUD hoàn thiện | Kết nối service | Kiểm thử | Trạng thái |
+|:---|:---|:---|:---:|:---:|:---:|:---:|:---:|
+| **API Gateway & Review** | Trương Văn Phong | `feat/api-gateway` | ✅ | ⬜ | ⬜ | ⬜ | 🟡 Đang làm |
+| **User & Auth Service** | Trần Đức Hải | `feat/user-auth` | ✅ | ⬜ | ⬜ | ⬜ | 🟡 Đang làm |
+| **Room Catalog Service** | Nguyễn Thành Hưng | `feat/room-catalog` | ✅ | ⬜ | ⬜ | ⬜ | 🟡 Đang làm |
+| **Booking Service** | Bùi Đại Dương | `feat/booking-service` | ✅ | ⬜ | ⬜ | ⬜ | 🟡 Đang làm |
+| **Payment & Notification** | Đậu Ngọc Anh | `feat/payment-notification` | ✅ | ⬜ | ⬜ | ⬜ | 🟡 Đang làm |
+| **Frontend (React)** | Cả nhóm | `feat/frontend` | ⬜ | ⬜ | ⬜ | ⬜ | ⏳ Chưa bắt đầu |
+
+**Chú thích trạng thái:**
+- ✅ Hoàn thành &nbsp;|&nbsp; ⬜ Chưa làm &nbsp;|&nbsp; 🔄 Đang làm
+- 🟢 Hoàn thiện &nbsp;|&nbsp; 🟡 Đang phát triển &nbsp;|&nbsp; ⏳ Chưa bắt đầu &nbsp;|&nbsp; 🔴 Có vấn đề
+
+### 📅 Milestone (Mốc thời gian dự kiến)
+
+| Giai đoạn | Nội dung | Deadline |
+|:---|:---|:---|
+| **Phase 1** | Setup môi trường + Base code tất cả services | ✅ Xong |
+| **Phase 2** | Hoàn thiện CRUD từng service + Kết nối giữa các service | 🔄 Đang thực hiện |
+| **Phase 3** | Xây dựng Frontend React + Tích hợp với API Gateway | ⏳ Chưa bắt đầu |
+| **Phase 4** | Kiểm thử toàn bộ hệ thống + Fix bug + Viết báo cáo | ⏳ Chưa bắt đầu |
+
+---
+
 ## 📋 Mục lục
 
 1. [Tech Stack](#-tech-stack)
