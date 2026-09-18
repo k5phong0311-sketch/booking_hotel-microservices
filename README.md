@@ -406,12 +406,12 @@ Tất cả request đều đi qua `API Gateway` tại `http://localhost:3000`.
 
 | Thành viên | Service phụ trách | Branch |
 |:---|:---|:---|
-| Thành viên 1 | API Gateway & Review Service | `feat/api-gateway` |
-| Thành viên 2 | User & Auth Service | `feat/user-auth` |
-| Thành viên 3 | Room Catalog Service | `feat/room-catalog` |
-| Thành viên 4 | Booking Service | `feat/booking-service` |
-| Thành viên 5 | Payment & Notification Service | `feat/payment-notification` |
+| Truong Van Phong | API Gateway & Review Service | `feat/api-gateway` |
+| Tran Duc Hai | User & Auth Service | `feat/user-auth` |
+| Nguyen Thanh Hung | Room Catalog Service | `feat/room-catalog` |
+| Bui Dai Duong | Booking Service | `feat/booking-service` |
+| Dau Ngoc Anh | Payment & Notification Service | `feat/payment-notification` |
 
 ---
 
-<p align="center">Made with ❤️ by Group 5</p>
+<p align="center">Made with ❤️ by Group TheLiemVietNam </p>
