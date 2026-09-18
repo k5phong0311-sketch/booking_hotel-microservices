@@ -1,4 +1,4 @@
-# 🏨 Hotel Booking System — Microservices
+# 🏨 Xây dựng hệ thống đặt phòng khách sạn BookingHotel theo kiến trúc Microservices
 
 Hệ thống đặt phòng khách sạn được xây dựng theo kiến trúc **Microservices**, sử dụng **NestJS (TypeScript)** cho Backend và **React (TypeScript)** cho Frontend.
 
