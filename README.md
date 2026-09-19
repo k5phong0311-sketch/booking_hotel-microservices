@@ -17,7 +17,7 @@ Hệ thống đặt phòng khách sạn được xây dựng theo kiến trúc *
 | **Room Catalog Service** | Nguyễn Thành Hưng | `feat/room-catalog` | ✅ | ✅ | ✅ | ⬜ | 🟡 Đang làm |
 | **Booking Service** | Bùi Đại Dương | `feat/booking-service` | ✅ | ✅ | ✅ | ⬜ | 🟡 Đang làm |
 | **Payment & Notification** | Đậu Ngọc Anh | `feat/payment-notification` | ✅ | ✅ | ✅ | ⬜ | 🟡 Đang làm |
-| **Frontend (React)** | Cả nhóm | `feat/frontend` | ⬜ | ⬜ | ⬜ | ⬜ | ⏳ Chưa bắt đầu |
+| **Frontend (React)** | Cả nhóm | `feat/frontend` | ✅ | ✅ | ✅ | ⬜ | 🟡 Đang làm |
 
 **Chú thích trạng thái:**
 - ✅ Hoàn thành &nbsp;|&nbsp; ⬜ Chưa làm &nbsp;|&nbsp; 🔄 Đang làm
@@ -29,8 +29,8 @@ Hệ thống đặt phòng khách sạn được xây dựng theo kiến trúc *
 |:---|:---|:---|
 | **Phase 1** | Setup môi trường + Base code tất cả services | ✅ Xong |
 | **Phase 2** | Hoàn thiện CRUD từng service + Kết nối giữa các service | ✅ Xong |
-| **Phase 3** | Xây dựng Frontend React + Tích hợp với API Gateway | 🔄 Đang thực hiện |
-| **Phase 4** | Kiểm thử toàn bộ hệ thống + Fix bug + Viết báo cáo | ⏳ Chưa bắt đầu |
+| **Phase 3** | Xây dựng Frontend React + Tích hợp với API Gateway | ✅ Xong |
+| **Phase 4** | Kiểm thử toàn bộ hệ thống + Fix bug + Viết báo cáo | 🔄 Đang thực hiện |
 
 ---
 
