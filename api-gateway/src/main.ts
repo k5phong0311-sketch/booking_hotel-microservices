@@ -9,8 +9,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.useGlobalFilters(new AllExceptionsFilter());
   app.enableCors();
-  const port = process.env.PORT || 3004;
+  const port = process.env.PORT || 3000;
   await app.listen(port);
-  console.log(`🚀 Payment & Notification Service is running on: http://localhost:${port}/api`);
+  console.log(`🚀 API Gateway is running on: http://localhost:${port}/api`);
 }
 bootstrap();
