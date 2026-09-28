@@ -1,12 +1,8 @@
 import { IsNumber, IsEnum, IsOptional, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import { PaymentMethod } from '../entities/payment.entity';
 
-// Phương thức thanh toán được hỗ trợ
-export enum PaymentMethod {
-  CASH     = 'CASH',      // Tiền mặt tại quầy
-  CARD     = 'CARD',      // Thẻ ngân hàng
-  TRANSFER = 'TRANSFER',  // Chuyển khoản
-}
+export { PaymentMethod };
 
 export class CreatePaymentDto {
   @Type(() => Number)

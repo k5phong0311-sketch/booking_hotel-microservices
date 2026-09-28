@@ -6,6 +6,12 @@ export enum PaymentStatus {
   FAILED = 'FAILED',
 }
 
+export enum PaymentMethod {
+  CASH = 'CASH',          // Tiền mặt tại quầy
+  CARD = 'CARD',          // Thẻ ngân hàng
+  TRANSFER = 'TRANSFER',  // Chuyển khoản
+}
+
 @Entity('payments')
 export class Payment {
   @PrimaryGeneratedColumn()
@@ -19,6 +25,9 @@ export class Payment {
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   amount: number;
+
+  @Column({ type: 'enum', enum: PaymentMethod, default: PaymentMethod.TRANSFER })
+  method: PaymentMethod;
 
   @Column({ type: 'enum', enum: PaymentStatus, default: PaymentStatus.PENDING })
   status: PaymentStatus;
