@@ -1,32 +1,62 @@
 import {
-  Controller, Get, Post, Param, Body, ParseIntPipe,
+  Controller, Get, Post, Param, Body, ParseIntPipe, Res, HttpStatus
 } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
-import { CreatePaymentDto } from './dto/create-payment.dto';
+import { CreatePaymentDto, PaymentMethod } from './dto/create-payment.dto';
+import { MomoService } from './momo.service';
 
 @Controller('payments')
 export class PaymentsController {
-  constructor(private readonly paymentsService: PaymentsService) {}
+  constructor(
+    private readonly paymentsService: PaymentsService,
+    private readonly momoService: MomoService
+  ) {}
 
-  // POST /api/payments — Xử lý thanh toán (gọi bởi Booking Service)
   @Post()
-  create(@Body() dto: CreatePaymentDto) {
-    return this.paymentsService.create(dto);
+  async create(@Body() dto: CreatePaymentDto) {
+    const payment = await this.paymentsService.create(dto);
+    
+    // Nếu chọn MOMO, gọi API tạo giao dịch MoMo
+    if (dto.method === PaymentMethod.MOMO) {
+      const momoResult = await this.momoService.createPayment(payment.id, Number(payment.amount));
+      return {
+        payment,
+        momoUrl: momoResult.payUrl, // URL chuyển hướng sang cổng thanh toán
+      };
+    }
+    
+    return { payment };
   }
 
-  // GET /api/payments/booking/:bookingId — Lấy thanh toán theo booking
+  @Post('momo/ipn')
+  async momoIpn(@Body() body: any) {
+    // MoMo server sẽ POST thông tin thanh toán vào đây
+    const isValid = this.momoService.verifySignature(body);
+    if (!isValid) {
+      return { message: 'Invalid signature' };
+    }
+
+    const paymentId = Number(body.extraData); // Lấy payment ID từ extraData
+
+    if (body.resultCode === 0) { // Thành công
+      await this.paymentsService.updateStatus(paymentId, 'SUCCESS', body.transId);
+    } else { // Thất bại
+      await this.paymentsService.updateStatus(paymentId, 'FAILED', body.transId);
+    }
+
+    return { message: 'Received' };
+  }
+
   @Get('booking/:bookingId')
   findByBooking(@Param('bookingId', ParseIntPipe) bookingId: number) {
     return this.paymentsService.findByBooking(bookingId);
   }
 
-  // GET /api/payments/user/:userId — Lịch sử thanh toán của user
   @Get('user/:userId')
   findByUser(@Param('userId', ParseIntPipe) userId: number) {
     return this.paymentsService.findByUser(userId);
   }
 
-  // GET /api/payments/:id — Chi tiết 1 giao dịch
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.paymentsService.findOne(id);

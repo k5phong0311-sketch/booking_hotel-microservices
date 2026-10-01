@@ -7,9 +7,10 @@ export enum PaymentStatus {
 }
 
 export enum PaymentMethod {
-  CASH = 'CASH',          // Tiền mặt tại quầy
-  CARD = 'CARD',          // Thẻ ngân hàng
-  TRANSFER = 'TRANSFER',  // Chuyển khoản
+  CASH = 'CASH',
+  CARD = 'CARD',
+  TRANSFER = 'TRANSFER',
+  MOMO = 'MOMO',
 }
 
 @Entity('payments')
@@ -33,7 +34,7 @@ export class Payment {
   status: PaymentStatus;
 
   @Column({ nullable: true })
-  transactionId: string; // Mã giao dịch (nếu có)
+  transactionId: string;
 
   @CreateDateColumn()
   createdAt: Date;

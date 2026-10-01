@@ -10,6 +10,7 @@ import RoomDetailPage from './pages/RoomDetailPage';
 import BookingPage from './pages/BookingPage';
 import MyBookingsPage from './pages/MyBookingsPage';
 import ProfilePage from './pages/ProfilePage';
+import PaymentCallbackPage from './pages/PaymentCallbackPage';
 
 const App: React.FC = () => {
   return (
@@ -38,6 +39,9 @@ const App: React.FC = () => {
           } />
           <Route path="/profile" element={
             <PrivateRoute><ProfilePage /></PrivateRoute>
+          } />
+          <Route path="/payment/callback" element={
+            <PaymentCallbackPage />
           } />
 
           {/* 404 */}

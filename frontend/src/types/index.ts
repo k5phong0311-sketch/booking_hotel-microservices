@@ -55,3 +55,18 @@ export interface ApiError {
   statusCode: number;
   message: string;
 }
+
+// ===== Payment =====
+export type PaymentStatus = 'PENDING' | 'SUCCESS' | 'FAILED';
+export type PaymentMethodType = 'CASH' | 'CARD' | 'TRANSFER' | 'MOMO';
+
+export interface Payment {
+  id: number;
+  bookingId: number;
+  userId: number;
+  amount: number;
+  method: PaymentMethodType;
+  status: PaymentStatus;
+  transactionId?: string;
+  createdAt: string;
+}

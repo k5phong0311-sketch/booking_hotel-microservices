@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { roomService } from '../services/room.service';
 import { bookingService } from '../services/booking.service';
-import { Room } from '../types';
+import { paymentService } from '../services/payment.service';
+import { Room, PaymentMethodType } from '../types';
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 
@@ -17,6 +18,7 @@ const BookingPage: React.FC = () => {
   const [error, setError] = useState('');
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>('MOMO');
 
   useEffect(() => {
     if (!roomId) return;
@@ -26,13 +28,11 @@ const BookingPage: React.FC = () => {
       .finally(() => setLoading(false));
   }, [roomId]);
 
-  // Tính số đêm và tổng tiền
   const nights = checkIn && checkOut
     ? Math.max(0, Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / 86400000))
     : 0;
   const totalPrice = nights * (room?.pricePerNight || 0);
 
-  // Ngày tối thiểu là hôm nay
   const today = new Date().toISOString().split('T')[0];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,13 +43,28 @@ const BookingPage: React.FC = () => {
     setError('');
     setSubmitting(true);
     try {
+      // 1. Tạo booking
       const booking = await bookingService.create({
         userId: user.id, roomId: room.id, checkIn, checkOut,
       });
-      navigate('/my-bookings', { state: { newBookingId: booking.id, status: booking.status } });
+
+      // 2. Tạo payment liên kết với booking
+      const paymentRes = await paymentService.create({
+        bookingId: booking.id,
+        userId: user.id,
+        amount: totalPrice,
+        method: paymentMethod,
+      });
+
+      // 3. Xử lý chuyển hướng
+      if (paymentMethod === 'MOMO' && paymentRes.momoUrl) {
+        window.location.href = paymentRes.momoUrl; // Chuyển hướng sang cổng MoMo
+      } else {
+        navigate('/my-bookings', { state: { newBookingId: booking.id, status: booking.status } });
+      }
+
     } catch (err: any) {
       setError(err.response?.data?.message || 'Đặt phòng thất bại. Vui lòng thử lại.');
-    } finally {
       setSubmitting(false);
     }
   };
@@ -61,7 +76,7 @@ const BookingPage: React.FC = () => {
     <div style={styles.page}>
       <div style={styles.container}>
         <button onClick={() => navigate(-1)} style={styles.back}>← Quay lại</button>
-        <h2 style={styles.title}>📅 Đặt phòng</h2>
+        <h2 style={styles.title}>🏨 Đặt phòng</h2>
 
         <div style={styles.layout}>
           {/* Form đặt phòng */}
@@ -85,17 +100,31 @@ const BookingPage: React.FC = () => {
                   value={`${user?.fullName} (${user?.email})`} readOnly />
               </div>
 
+              <div style={styles.field}>
+                <label style={styles.label}>Phương thức thanh toán</label>
+                <select 
+                  style={styles.input} 
+                  value={paymentMethod} 
+                  onChange={e => setPaymentMethod(e.target.value as PaymentMethodType)}
+                >
+                  <option value="MOMO">Ví điện tử MoMo (Khuyên dùng)</option>
+                  <option value="CARD">Thẻ ngân hàng</option>
+                  <option value="TRANSFER">Chuyển khoản thủ công</option>
+                  <option value="CASH">Tiền mặt tại quầy</option>
+                </select>
+              </div>
+
               {nights > 0 && (
                 <div style={styles.summary}>
                   <p>🌙 Số đêm: <strong>{nights}</strong></p>
-                  <p>💰 Giá/đêm: <strong>{Number(room.pricePerNight).toLocaleString('vi-VN')}đ</strong></p>
+                  <p>💵 Giá/đêm: <strong>{Number(room.pricePerNight).toLocaleString('vi-VN')}đ</strong></p>
                   <hr style={{ border: 'none', borderTop: '1px dashed #ddd' }} />
                   <p style={styles.total}>Tổng cộng: <strong>{totalPrice.toLocaleString('vi-VN')}đ</strong></p>
                 </div>
               )}
 
               <button type="submit" style={styles.btn} disabled={submitting || nights <= 0}>
-                {submitting ? '⏳ Đang xử lý...' : '✅ Xác nhận đặt phòng'}
+                {submitting ? '⏳ Đang xử lý...' : (paymentMethod === 'MOMO' ? '💳 Thanh toán qua MoMo' : '✅ Xác nhận đặt phòng')}
               </button>
             </form>
           </div>
@@ -107,7 +136,7 @@ const BookingPage: React.FC = () => {
               ? <img src={room.imageUrl} alt={room.name} style={styles.roomImg} />
               : <div style={styles.roomPlaceholder}>🛏️</div>}
             <h4 style={styles.roomName}>{room.name}</h4>
-            <p style={styles.roomType}>🏷️ {room.type} — Tầng {room.floor}</p>
+            <p style={styles.roomType}>🏷️ {room.type} - Tầng {room.floor}</p>
             <p style={styles.roomPrice}>{Number(room.pricePerNight).toLocaleString('vi-VN')}đ/đêm</p>
           </div>
         </div>
@@ -131,11 +160,11 @@ const styles: Record<string, React.CSSProperties> = {
   form: { display: 'flex', flexDirection: 'column', gap: 16 },
   field: { display: 'flex', flexDirection: 'column', gap: 6 },
   label: { fontSize: 13, fontWeight: 600, color: '#444' },
-  input: { padding: '10px 14px', borderRadius: 8, border: '1px solid #ddd', fontSize: 14 },
+  input: { padding: '10px 14px', borderRadius: 8, border: '1px solid #ddd', fontSize: 14, outline: 'none' },
   summary: { background: '#f8f9fa', padding: 16, borderRadius: 10, fontSize: 14, lineHeight: 1.8 },
   total: { fontSize: 16, color: '#e94560' },
-  btn: { background: '#e94560', color: '#fff', border: 'none', padding: '14px',
-    borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer' },
+  btn: { background: '#a50064', color: '#fff', border: 'none', padding: '14px',
+    borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', transition: '0.2s' },
   roomCard: { background: '#fff', padding: 24, borderRadius: 16,
     boxShadow: '0 4px 16px rgba(0,0,0,0.08)', alignSelf: 'start' },
   roomImg: { width: '100%', height: 180, objectFit: 'cover', borderRadius: 8, marginBottom: 12 },
