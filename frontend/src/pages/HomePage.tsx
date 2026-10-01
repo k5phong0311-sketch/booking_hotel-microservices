@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { roomService } from '../services/room.service';
 import { Room } from '../types';
 import RoomCard from '../components/RoomCard';
 import LoadingSpinner from '../components/LoadingSpinner';
+import BookingSlideOver from '../components/BookingSlideOver'; // Component mới sẽ tạo sau
 
 const HomePage: React.FC = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('ALL');
+  
+  // State quản lý Slide-over
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
 
   useEffect(() => {
     roomService.getAll()
       .then(data => setRooms(data))
-      .catch(() => setError('Không thể tải danh sách phòng. Backend có đang chạy không?'))
+      .catch(() => setError('Lỗi kết nối đến máy chủ.'))
       .finally(() => setLoading(false));
   }, []);
 
@@ -26,160 +29,97 @@ const HomePage: React.FC = () => {
   const filtered = filter === 'ALL' ? rooms : rooms.filter(r => r.type === filter);
 
   return (
-    <div style={styles.page}>
-      {/* Hero Banner Luxury */}
-      <div style={styles.hero}>
-        <div style={styles.heroOverlay}></div>
-        <div style={styles.heroContent}>
-          <div style={styles.heroEyebrow}>LUXUS INTERIOR & HOTEL</div>
-          <h1 style={styles.heroTitle}>KIẾN TẠO<br/>KHÔNG GIAN<br/>VƯỢT TRỘI</h1>
-          <p style={styles.heroSub}>Trải nghiệm không gian sống tinh tế, đẳng cấp và trường tồn cùng thời gian.</p>
-          <div style={styles.heroActions}>
-            <a href="#rooms" style={styles.btnGoldFill}>Khám phá phòng nghỉ</a>
-            <a href="#about" style={styles.btnGoldOutline}>Trải nghiệm 360°</a>
+    <div className="min-h-screen bg-gray-50 pb-20">
+      {/* Hero Banner - Bright & Airy */}
+      <section className="relative h-[85vh] min-h-[600px] flex items-center justify-center bg-gray-100 overflow-hidden">
+        {/* Background Image with Light Overlay */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=2000&auto=format&fit=crop")' }}
+        ></div>
+        <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]"></div>
+        
+        {/* Hero Content */}
+        <div className="relative z-10 text-center max-w-4xl px-6 mt-16">
+          <span className="block text-brand-dark font-semibold tracking-[4px] uppercase text-sm mb-6">Trải nghiệm nghỉ dưỡng đẳng cấp</span>
+          <h1 className="text-5xl md:text-7xl font-serif font-bold text-gray-900 leading-tight mb-8 drop-shadow-sm">
+            Nơi bình yên <br className="hidden md:block" />
+            <span className="text-brand-dark">giao hòa</span> cùng thiên nhiên.
+          </h1>
+          <p className="text-lg md:text-xl text-gray-800 font-medium max-w-2xl mx-auto mb-10">
+            Khám phá các không gian tinh tế được thiết kế riêng để mang lại sự thư thái tuyệt đối cho kỳ nghỉ của bạn.
+          </p>
+          <a href="#discover" className="inline-block bg-brand-dark text-white font-medium px-8 py-4 rounded hover:bg-brand-DEFAULT transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
+            Bắt đầu khám phá
+          </a>
+        </div>
+      </section>
+
+      {/* Discovery Section */}
+      <section id="discover" className="max-w-7xl mx-auto px-6 pt-24">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-4">Không Gian Nghỉ Dưỡng</h2>
+          <div className="w-16 h-1 bg-accent mx-auto mb-8 rounded"></div>
+          
+          {/* Filters */}
+          <div className="flex flex-wrap justify-center gap-3">
+            {types.map(t => (
+              <button 
+                key={t} 
+                onClick={() => setFilter(t)}
+                className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
+                  filter === t 
+                  ? 'bg-brand-dark text-white shadow-md' 
+                  : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                {typeLabel[t]}
+              </button>
+            ))}
           </div>
-        </div>
-      </div>
-
-      <div id="rooms" style={styles.container}>
-        <div style={styles.sectionHeader}>
-          <h2 style={styles.sectionTitle}>KHÔNG GIAN NGHỈ DƯỠNG</h2>
-          <div style={styles.divider}></div>
-        </div>
-
-        {/* Filter tabs */}
-        <div style={styles.filters}>
-          {types.map(t => (
-            <button key={t} onClick={() => setFilter(t)}
-              style={{ ...styles.filterBtn, ...(filter === t ? styles.filterActive : {}) }}>
-              {typeLabel[t]}
-            </button>
-          ))}
         </div>
 
         {loading && <LoadingSpinner text="Đang tải danh sách phòng..." />}
-        {error && <div style={styles.error}>⚠️ {error}</div>}
+        {error && (
+          <div className="bg-red-50 text-red-600 p-4 rounded-lg text-center max-w-2xl mx-auto border border-red-100">
+            {error}
+          </div>
+        )}
 
         {!loading && !error && (
           <>
-            <p style={styles.count}>Tìm thấy <strong style={{color: '#c5a059'}}>{filtered.length}</strong> không gian phù hợp</p>
-            {filtered.length === 0
-              ? <div style={styles.empty}>Không có phòng nào phù hợp với lựa chọn của quý khách.</div>
-              : <div style={styles.grid}>
-                  {filtered.map(room => <RoomCard key={room.id} room={room} />)}
-                </div>
-            }
+            <p className="text-gray-500 mb-8 font-medium">
+              Tìm thấy <span className="text-brand-dark font-bold">{filtered.length}</span> không gian phù hợp
+            </p>
+            
+            {filtered.length === 0 ? (
+              <div className="text-center py-20 text-gray-500 bg-white rounded-2xl border border-gray-100">
+                Không có phòng nào phù hợp với lựa chọn của quý khách.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filtered.map(room => (
+                  <RoomCard 
+                    key={room.id} 
+                    room={room} 
+                    onBook={() => setSelectedRoom(room)} 
+                  />
+                ))}
+              </div>
+            )}
           </>
         )}
-      </div>
+      </section>
+
+      {/* Slide-over Booking Component */}
+      {selectedRoom && (
+        <BookingSlideOver 
+          room={selectedRoom} 
+          onClose={() => setSelectedRoom(null)} 
+        />
+      )}
     </div>
   );
-};
-
-const styles: Record<string, React.CSSProperties> = {
-  page: { background: '#0b0c10', minHeight: '100vh', color: '#e0e0e0' },
-  hero: { 
-    position: 'relative',
-    height: '90vh',
-    minHeight: '600px',
-    backgroundImage: 'url("https://images.unsplash.com/photo-1542314831-c6a4d45c30c2?q=80&w=2000&auto=format&fit=crop")',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundAttachment: 'fixed',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  heroOverlay: {
-    position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
-    background: 'linear-gradient(90deg, rgba(11,12,16,0.9) 0%, rgba(11,12,16,0.4) 100%)',
-    zIndex: 1
-  },
-  heroContent: {
-    position: 'relative',
-    zIndex: 2,
-    maxWidth: 1200,
-    margin: '0 auto',
-    padding: '0 40px',
-    width: '100%'
-  },
-  heroEyebrow: {
-    color: '#c5a059',
-    fontSize: 14,
-    fontWeight: 600,
-    letterSpacing: '3px',
-    marginBottom: 20,
-    textTransform: 'uppercase'
-  },
-  heroTitle: { 
-    margin: '0 0 24px', 
-    fontSize: 64, 
-    fontWeight: 700, 
-    lineHeight: 1.1,
-    color: '#fff',
-    letterSpacing: '2px'
-  },
-  heroSub: { 
-    margin: '0 0 40px', 
-    fontSize: 18, 
-    color: '#ccc',
-    maxWidth: '500px',
-    lineHeight: 1.6
-  },
-  heroActions: {
-    display: 'flex',
-    gap: 20
-  },
-  btnGoldFill: {
-    background: '#c5a059',
-    color: '#0b0c10',
-    padding: '16px 32px',
-    fontSize: 14,
-    fontWeight: 700,
-    textTransform: 'uppercase',
-    letterSpacing: '1px',
-    textDecoration: 'none',
-    transition: 'all 0.3s'
-  },
-  btnGoldOutline: {
-    background: 'transparent',
-    border: '1px solid #c5a059',
-    color: '#c5a059',
-    padding: '16px 32px',
-    fontSize: 14,
-    fontWeight: 700,
-    textTransform: 'uppercase',
-    letterSpacing: '1px',
-    textDecoration: 'none',
-    transition: 'all 0.3s'
-  },
-  container: { maxWidth: 1200, margin: '0 auto', padding: '80px 20px' },
-  sectionHeader: { textAlign: 'center', marginBottom: 60 },
-  sectionTitle: { fontSize: 32, fontWeight: 600, letterSpacing: '2px', margin: '0 0 16px' },
-  divider: { width: 60, height: 2, background: '#c5a059', margin: '0 auto' },
-  filters: { display: 'flex', gap: 16, marginBottom: 40, flexWrap: 'wrap', justifyContent: 'center' },
-  filterBtn: { 
-    padding: '10px 24px', 
-    border: '1px solid #333', 
-    background: 'transparent', 
-    cursor: 'pointer', 
-    fontSize: 13, 
-    color: '#aaa',
-    textTransform: 'uppercase',
-    letterSpacing: '1px',
-    transition: 'all 0.3s'
-  },
-  filterActive: { 
-    background: '#c5a059', 
-    color: '#0b0c10', 
-    border: '1px solid #c5a059', 
-    fontWeight: 600 
-  },
-  count: { color: '#888', marginBottom: 30, fontSize: 15, textAlign: 'center' },
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 32 },
-  error: { background: 'rgba(231, 76, 60, 0.1)', border: '1px solid #e74c3c', color: '#e74c3c',
-    padding: 20, textAlign: 'center' },
-  empty: { textAlign: 'center', padding: 80, color: '#666', fontSize: 16, fontStyle: 'italic' },
 };
 
 export default HomePage;
