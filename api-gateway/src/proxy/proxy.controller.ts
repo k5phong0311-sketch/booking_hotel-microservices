@@ -8,31 +8,27 @@ import { Request, Response } from 'express';
 export class ProxyController {
   constructor(private readonly proxyService: ProxyService) {}
 
-  // Route tới user-service
-  @All('auth/*')
+  @All(['auth', 'auth/*'])
   async proxyAuth(@Req() req: Request, @Res() res: Response) {
     return this.proxyService.forward(req, res, process.env.USER_SERVICE_URL);
   }
 
-  @All('users/*')
+  @All(['users', 'users/*'])
   async proxyUsers(@Req() req: Request, @Res() res: Response) {
     return this.proxyService.forward(req, res, process.env.USER_SERVICE_URL);
   }
 
-  // Route tới room-service
-  @All('rooms/*')
+  @All(['rooms', 'rooms/*'])
   async proxyRooms(@Req() req: Request, @Res() res: Response) {
     return this.proxyService.forward(req, res, process.env.ROOM_SERVICE_URL);
   }
 
-  // Route tới booking-service
-  @All('bookings/*')
+  @All(['bookings', 'bookings/*'])
   async proxyBookings(@Req() req: Request, @Res() res: Response) {
     return this.proxyService.forward(req, res, process.env.BOOKING_SERVICE_URL);
   }
 
-  // Route tới payment-service
-  @All('payments/*')
+  @All(['payments', 'payments/*'])
   async proxyPayments(@Req() req: Request, @Res() res: Response) {
     return this.proxyService.forward(req, res, process.env.PAYMENT_SERVICE_URL);
   }
