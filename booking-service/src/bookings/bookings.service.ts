@@ -15,8 +15,7 @@ export class BookingsService {
   ) {}
 
   async create(dto: CreateBookingDto): Promise<Booking> {
-    // Bước 1: Gọi Room Service kiểm tra phòng còn trống + lấy giá
-    let pricePerNight: number;
+    // Bước 1: Kiểm tra phòng còn trống không
     try {
       const roomRes = await firstValueFrom(
         this.httpService.get(
@@ -25,59 +24,46 @@ export class BookingsService {
         ),
       );
       if (!roomRes.data.available) {
-        throw new HttpException('Phòng đã được đặt, vui lòng chọn phòng khác', HttpStatus.CONFLICT);
+        throw new HttpException('Phòng đã được đặt', HttpStatus.CONFLICT);
       }
-      pricePerNight = roomRes.data.pricePerNight;
     } catch (err) {
       if (err instanceof HttpException) throw err;
-      throw new HttpException('Room Service không khả dụng, thử lại sau', HttpStatus.BAD_GATEWAY);
+      throw new HttpException('Room Service không khả dụng', HttpStatus.BAD_GATEWAY);
     }
 
-    // Bước 2: Tính tổng tiền theo số đêm thực tế
+    // Bước 2: Tính tiền
     const checkIn = new Date(dto.checkIn);
     const checkOut = new Date(dto.checkOut);
     const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
-    if (nights <= 0) {
-      throw new HttpException('Ngày trả phòng phải sau ngày nhận phòng', HttpStatus.BAD_REQUEST);
-    }
-    const totalPrice = nights * pricePerNight;
 
-    // Bước 3: Tạo booking với trạng thái PENDING
+    // Bước 3: Tạo booking PENDING
     const booking = this.bookingRepo.create({
       ...dto,
-      checkIn,
-      checkOut,
-      totalPrice,
+      totalPrice: nights * 500000, // Tạm thời hardcode, sẽ lấy từ room-service
       status: BookingStatus.PENDING,
     });
     const saved = await this.bookingRepo.save(booking);
 
-    // Bước 4: Gọi Payment Service
+    // Bước 4: Gọi payment-service
     try {
       await firstValueFrom(
         this.httpService.post(
           `${process.env.PAYMENT_SERVICE_URL}/api/payments`,
-          { bookingId: saved.id, userId: dto.userId, amount: totalPrice },
+          { bookingId: saved.id, userId: dto.userId, amount: saved.totalPrice },
           { timeout: 5000 },
         ),
       );
     } catch {
-      // Payment lỗi → Compensating: cập nhật booking thành FAILED
+      // Nếu payment lỗi -> cập nhật booking thành FAILED
       await this.bookingRepo.update(saved.id, { status: BookingStatus.FAILED });
-      throw new HttpException(
-        'Thanh toán thất bại. Đơn đặt phòng đã bị hủy, vui lòng thử lại.',
-        HttpStatus.PAYMENT_REQUIRED,
-      );
+      throw new HttpException('Thanh toán thất bại, vui lòng thử lại', HttpStatus.PAYMENT_REQUIRED);
     }
 
-    return this.findOne(saved.id);
+    return saved;
   }
 
   async findByUser(userId: number): Promise<Booking[]> {
-    return this.bookingRepo.find({
-      where: { userId },
-      order: { createdAt: 'DESC' },
-    });
+    return this.bookingRepo.find({ where: { userId } });
   }
 
   async findOne(id: number): Promise<Booking> {
@@ -87,27 +73,11 @@ export class BookingsService {
   }
 
   async updateStatus(id: number, status: BookingStatus): Promise<Booking> {
-    await this.findOne(id);
     await this.bookingRepo.update(id, { status });
     return this.findOne(id);
   }
 
   async cancel(id: number): Promise<Booking> {
-    const booking = await this.findOne(id);
-    if (booking.status === BookingStatus.CONFIRMED) {
-      // Nếu đã confirmed thì cần mở lại phòng
-      try {
-        await firstValueFrom(
-          this.httpService.patch(
-            `${process.env.ROOM_SERVICE_URL}/api/rooms/${booking.roomId}/toggle-availability`,
-            {},
-            { timeout: 5000 },
-          ),
-        );
-      } catch {
-        console.warn(`Không thể mở lại trạng thái phòng #${booking.roomId}`);
-      }
-    }
     return this.updateStatus(id, BookingStatus.CANCELED);
   }
 }
