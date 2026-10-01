@@ -1,87 +1,72 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { authService } from '../services/auth.service';
-import { useAuth } from '../context/AuthContext';
 
 const RegisterPage: React.FC = () => {
-  const [form, setForm] = useState({ email: '', password: '', fullName: '', phone: '' });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
   const navigate = useNavigate();
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (form.password.length < 6) {
-      setError('Mật khẩu phải có ít nhất 6 ký tự');
-      return;
-    }
     setError('');
     setLoading(true);
     try {
-      const data = await authService.register(form.email, form.password, form.fullName, form.phone);
-      login(data.access_token, data.user);
-      navigate('/');
+      await authService.register({ email, password, fullName, phone });
+      navigate('/login');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Đăng ký thất bại. Email có thể đã tồn tại.');
+      setError(err.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
-        <h2 style={styles.title}>📝 Đăng ký tài khoản</h2>
-        <p style={styles.sub}>Tạo tài khoản để đặt phòng khách sạn dễ dàng hơn.</p>
-        {error && <div style={styles.error}>{error}</div>}
-        <form onSubmit={handleSubmit} style={styles.form}>
-          {[
-            { name: 'fullName', label: 'Họ và tên', type: 'text', placeholder: 'Nguyễn Văn A' },
-            { name: 'email', label: 'Email', type: 'email', placeholder: 'email@example.com' },
-            { name: 'password', label: 'Mật khẩu (tối thiểu 6 ký tự)', type: 'password', placeholder: '••••••••' },
-            { name: 'phone', label: 'Số điện thoại (tuỳ chọn)', type: 'tel', placeholder: '0901234567' },
-          ].map(f => (
-            <div key={f.name} style={styles.field}>
-              <label style={styles.label}>{f.label}</label>
-              <input style={styles.input} name={f.name} type={f.type}
-                value={(form as any)[f.name]} onChange={handleChange}
-                placeholder={f.placeholder} required={f.name !== 'phone'} />
-            </div>
-          ))}
-          <button type="submit" style={styles.btn} disabled={loading}>
-            {loading ? 'Đang tạo tài khoản...' : 'Tạo tài khoản'}
+    <div className="min-h-screen bg-brand-light flex items-center justify-center p-6 py-12">
+      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md border border-brand-DEFAULT/10">
+        <div className="text-center mb-8">
+          <Link to="/" className="inline-block w-12 h-12 bg-brand-dark rounded-lg flex items-center justify-center mb-4 mx-auto">
+            <span className="text-white font-serif font-bold text-2xl">L</span>
+          </Link>
+          <h2 className="text-2xl font-serif font-bold text-gray-900 mb-2">Tạo tài khoản mới</h2>
+          <p className="text-gray-500 text-sm">Gia nhập cộng đồng thượng lưu của LUXUS</p>
+        </div>
+
+        {error && <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm mb-6 text-center border border-red-100">{error}</div>}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Họ và Tên</label>
+            <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} required className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-DEFAULT/20 outline-none text-sm" placeholder="Nguyễn Văn A" />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Số điện thoại</label>
+            <input type="text" value={phone} onChange={e => setPhone(e.target.value)} required className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-DEFAULT/20 outline-none text-sm" placeholder="0901234567" />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Email</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-DEFAULT/20 outline-none text-sm" placeholder="example@email.com" />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Mật khẩu</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-DEFAULT/20 outline-none text-sm" placeholder="••••••••" />
+          </div>
+
+          <button type="submit" disabled={loading} className="w-full py-3.5 bg-brand-dark text-white rounded-lg font-bold tracking-wide uppercase hover:bg-brand-DEFAULT transition-all shadow-md mt-6">
+            {loading ? 'ĐANG XỬ LÝ...' : 'ĐĂNG KÝ'}
           </button>
         </form>
-        <p style={styles.footer}>
-          Đã có tài khoản? <Link to="/login" style={styles.linkText}>Đăng nhập</Link>
+
+        <p className="text-center text-sm text-gray-500 mt-8">
+          Đã có tài khoản? <Link to="/login" className="text-brand-DEFAULT font-bold hover:underline">Đăng nhập</Link>
         </p>
       </div>
     </div>
   );
-};
-
-const styles: Record<string, React.CSSProperties> = {
-  page: { minHeight: '100vh', display: 'flex', alignItems: 'center',
-    justifyContent: 'center', background: '#f5f5f5', padding: 20 },
-  card: { background: '#fff', padding: 40, borderRadius: 16, width: 420,
-    boxShadow: '0 8px 32px rgba(0,0,0,0.12)' },
-  title: { margin: '0 0 6px', fontSize: 26, color: '#1a1a2e', fontWeight: 700 },
-  sub: { margin: '0 0 24px', color: '#888', fontSize: 14 },
-  error: { background: '#fff0f0', border: '1px solid #ffcccc', color: '#c0392b',
-    padding: '10px 14px', borderRadius: 8, marginBottom: 16, fontSize: 14 },
-  form: { display: 'flex', flexDirection: 'column', gap: 14 },
-  field: { display: 'flex', flexDirection: 'column', gap: 6 },
-  label: { fontSize: 13, fontWeight: 600, color: '#444' },
-  input: { padding: '10px 14px', borderRadius: 8, border: '1px solid #ddd', fontSize: 14 },
-  btn: { background: '#e94560', color: '#fff', border: 'none', padding: '12px',
-    borderRadius: 8, fontSize: 15, fontWeight: 700, cursor: 'pointer', marginTop: 8 },
-  footer: { textAlign: 'center', marginTop: 20, fontSize: 14, color: '#888' },
-  linkText: { color: '#e94560', fontWeight: 600, textDecoration: 'none' },
 };
 
 export default RegisterPage;

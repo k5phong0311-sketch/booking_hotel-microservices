@@ -1,128 +1,127 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { bookingService } from '../services/booking.service';
-import { useAuth } from '../context/AuthContext';
 import { Booking } from '../types';
+import Navbar from '../components/Navbar';
 import LoadingSpinner from '../components/LoadingSpinner';
 
-const statusLabel: Record<string, { text: string; color: string }> = {
-  PENDING:   { text: '⏳ Chờ xử lý',   color: '#f39c12' },
-  CONFIRMED: { text: '✅ Đã xác nhận', color: '#27ae60' },
-  CANCELED:  { text: '🚫 Đã hủy',      color: '#95a5a6' },
-  FAILED:    { text: '❌ Thất bại',    color: '#e74c3c' },
-};
-
 const MyBookingsPage: React.FC = () => {
-  const { user } = useAuth();
-  const location = useLocation();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
-  const [cancelingId, setCancelingId] = useState<number | null>(null);
-  const newBookingId = (location.state as any)?.newBookingId;
+  const [error, setError] = useState('');
+  const location = useLocation();
+
+  useEffect(() => {
+    fetchBookings();
+  }, []);
 
   const fetchBookings = () => {
-    if (!user) return;
-    bookingService.getMyBookings(user.id)
+    setLoading(true);
+    bookingService.getMyBookings()
       .then(data => setBookings(data))
-      .catch(console.error)
+      .catch(() => setError('Lỗi khi tải lịch sử đặt phòng.'))
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchBookings(); }, [user]);
-
-  const handleCancel = async (id: number) => {
-    if (!confirm('Bạn có chắc muốn hủy đơn đặt phòng này?')) return;
-    setCancelingId(id);
+  const handleCancel = async (bookingId: string) => {
+    if (!window.confirm('Bạn có chắc chắn muốn hủy đơn đặt phòng này?')) return;
     try {
-      await bookingService.cancel(id);
+      await bookingService.cancel(bookingId);
       fetchBookings();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Không thể hủy đơn. Thử lại sau.');
-    } finally {
-      setCancelingId(null);
+      alert(err.response?.data?.message || 'Lỗi khi hủy phòng');
     }
   };
 
-  if (loading) return <LoadingSpinner text="Đang tải lịch sử đặt phòng..." />;
+  const statusColor: Record<string, string> = {
+    PENDING: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    CONFIRMED: 'bg-accent-light/20 text-accent-dark border-accent-DEFAULT/20',
+    CANCELLED: 'bg-red-100 text-red-800 border-red-200',
+    FAILED: 'bg-gray-100 text-gray-800 border-gray-200',
+  };
+
+  const statusLabel: Record<string, string> = {
+    PENDING: 'Đang xử lý thanh toán', CONFIRMED: 'Đã xác nhận', CANCELLED: 'Đã hủy', FAILED: 'Thất bại'
+  };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.container}>
-        <h2 style={styles.title}>📋 Đơn đặt phòng của tôi</h2>
+    <div className="min-h-screen bg-gray-50 pt-24 pb-20">
+      <div className="max-w-5xl mx-auto px-6">
+        <h1 className="text-3xl font-serif font-bold text-gray-900 mb-2">Chuyến đi của tôi</h1>
+        <p className="text-gray-500 mb-8">Quản lý các đặt phòng và lịch sử lưu trú của bạn tại LUXUS.</p>
 
-        {newBookingId && (
-          <div style={styles.successBanner}>
-            🎉 Đặt phòng thành công! Mã đơn: <strong>#{newBookingId}</strong>
+        {location.state?.newBookingId && (
+          <div className="bg-accent-light/20 border border-accent-DEFAULT/30 text-accent-dark p-4 rounded-xl mb-8 flex items-center gap-3">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+            <div>
+              <p className="font-bold">Đặt phòng thành công!</p>
+              <p className="text-sm">Mã đơn: {location.state.newBookingId} - Trạng thái: {statusLabel[location.state.status]}</p>
+            </div>
           </div>
         )}
 
-        {bookings.length === 0
-          ? <div style={styles.empty}>
-              <p style={{ fontSize: 48 }}>📭</p>
-              <p>Bạn chưa có đơn đặt phòng nào.</p>
+        {loading && <LoadingSpinner text="Đang tải dữ liệu..." />}
+        {error && <div className="bg-red-50 text-red-600 p-4 rounded-xl text-center border border-red-100">{error}</div>}
+
+        {!loading && !error && bookings.length === 0 && (
+          <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-10 h-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
             </div>
-          : <div style={styles.list}>
-              {bookings.map(b => {
-                const s = statusLabel[b.status] || { text: b.status, color: '#999' };
-                return (
-                  <div key={b.id} style={{ ...styles.card, ...(b.id === newBookingId ? styles.highlight : {}) }}>
-                    <div style={styles.cardHeader}>
-                      <span style={styles.bookingId}>Đơn #{b.id}</span>
-                      <span style={{ ...styles.badge, background: s.color }}>{s.text}</span>
+            <p className="text-gray-500 mb-4">Bạn chưa có đơn đặt phòng nào.</p>
+            <a href="/" className="inline-block px-6 py-2.5 bg-brand-dark text-white rounded font-medium hover:bg-brand-DEFAULT transition-colors">Khám phá ngay</a>
+          </div>
+        )}
+
+        {!loading && !error && bookings.length > 0 && (
+          <div className="space-y-6">
+            {bookings.map(booking => (
+              <div key={booking.id} className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm flex flex-col md:flex-row gap-6">
+                <div className="md:w-1/3 bg-gray-50 rounded-xl p-4 border border-gray-100 flex flex-col justify-center text-center">
+                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold border mb-3 w-max mx-auto ${statusColor[booking.status]}`}>
+                    {statusLabel[booking.status] || booking.status}
+                  </span>
+                  <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Mã đặt phòng</p>
+                  <p className="font-mono font-bold text-gray-900">{booking.id}</p>
+                </div>
+                
+                <div className="md:w-2/3 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-xl font-serif font-bold text-gray-900 mb-4">Phòng {booking.roomId}</h3>
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">Nhận phòng</p>
+                        <p className="font-medium text-gray-900">{new Date(booking.checkIn).toLocaleDateString('vi-VN')}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">Trả phòng</p>
+                        <p className="font-medium text-gray-900">{new Date(booking.checkOut).toLocaleDateString('vi-VN')}</p>
+                      </div>
                     </div>
-                    <div style={styles.cardBody}>
-                      <div style={styles.row}>
-                        <span>🏠 Phòng số</span><strong>#{b.roomId}</strong>
-                      </div>
-                      <div style={styles.row}>
-                        <span>📅 Nhận phòng</span><strong>{new Date(b.checkIn).toLocaleDateString('vi-VN')}</strong>
-                      </div>
-                      <div style={styles.row}>
-                        <span>📅 Trả phòng</span><strong>{new Date(b.checkOut).toLocaleDateString('vi-VN')}</strong>
-                      </div>
-                      <div style={styles.row}>
-                        <span>💰 Tổng tiền</span>
-                        <strong style={{ color: '#e94560' }}>{Number(b.totalPrice).toLocaleString('vi-VN')}đ</strong>
-                      </div>
-                      <div style={styles.row}>
-                        <span>🕐 Đặt lúc</span><strong>{new Date(b.createdAt).toLocaleString('vi-VN')}</strong>
-                      </div>
+                  </div>
+                  
+                  <div className="flex items-end justify-between pt-4 border-t border-gray-100">
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Tổng thanh toán</p>
+                      <p className="text-xl font-bold text-brand-dark font-serif">{Number(booking.totalPrice).toLocaleString('vi-VN')} đ</p>
                     </div>
-                    {b.status === 'CONFIRMED' && (
-                      <button onClick={() => handleCancel(b.id)} disabled={cancelingId === b.id}
-                        style={styles.cancelBtn}>
-                        {cancelingId === b.id ? 'Đang hủy...' : '🚫 Hủy đơn'}
+                    {(booking.status === 'PENDING' || booking.status === 'CONFIRMED') && (
+                      <button 
+                        onClick={() => handleCancel(booking.id)}
+                        className="text-sm font-medium text-red-500 hover:text-red-700 hover:underline px-2 py-1"
+                      >
+                        Hủy phòng
                       </button>
                     )}
                   </div>
-                );
-              })}
-            </div>
-        }
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
-};
-
-const styles: Record<string, React.CSSProperties> = {
-  page: { background: '#f8f9fa', minHeight: '100vh', padding: '32px 20px' },
-  container: { maxWidth: 800, margin: '0 auto' },
-  title: { margin: '0 0 24px', fontSize: 26, color: '#1a1a2e', fontWeight: 700 },
-  successBanner: { background: '#eafaf1', border: '1px solid #a9dfbf', color: '#1e8449',
-    padding: '14px 20px', borderRadius: 10, marginBottom: 24, fontSize: 15 },
-  empty: { textAlign: 'center', padding: 80, color: '#888', fontSize: 16 },
-  list: { display: 'flex', flexDirection: 'column', gap: 16 },
-  card: { background: '#fff', borderRadius: 12, overflow: 'hidden',
-    boxShadow: '0 2px 12px rgba(0,0,0,0.08)' },
-  highlight: { border: '2px solid #27ae60' },
-  cardHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-    padding: '14px 20px', background: '#f8f9fa', borderBottom: '1px solid #eee' },
-  bookingId: { fontWeight: 700, color: '#1a1a2e', fontSize: 15 },
-  badge: { color: '#fff', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 },
-  cardBody: { padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 10 },
-  row: { display: 'flex', justifyContent: 'space-between', fontSize: 14, color: '#555' },
-  cancelBtn: { width: '100%', background: 'none', border: 'none', borderTop: '1px solid #eee',
-    padding: '12px', cursor: 'pointer', color: '#e74c3c', fontWeight: 600, fontSize: 14 },
 };
 
 export default MyBookingsPage;

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { authService } from '../services/auth.service';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage: React.FC = () => {
@@ -16,63 +15,70 @@ const LoginPage: React.FC = () => {
     setError('');
     setLoading(true);
     try {
-      const data = await authService.login(email, password);
-      login(data.access_token, data.user);
+      await login(email, password);
       navigate('/');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Đăng nhập thất bại. Kiểm tra lại email/mật khẩu.');
+      setError(err.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
-        <h2 style={styles.title}>🔐 Đăng nhập</h2>
-        <p style={styles.sub}>Chào mừng trở lại! Vui lòng đăng nhập để tiếp tục.</p>
-        {error && <div style={styles.error}>{error}</div>}
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.field}>
-            <label style={styles.label}>Email</label>
-            <input style={styles.input} type="email" value={email}
-              onChange={e => setEmail(e.target.value)} placeholder="email@example.com" required />
+    <div className="min-h-screen bg-brand-light flex items-center justify-center p-6">
+      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md border border-brand-DEFAULT/10">
+        <div className="text-center mb-8">
+          <Link to="/" className="inline-block w-12 h-12 bg-brand-dark rounded-lg flex items-center justify-center mb-4 mx-auto">
+            <span className="text-white font-serif font-bold text-2xl">L</span>
+          </Link>
+          <h2 className="text-2xl font-serif font-bold text-gray-900 mb-2">Chào mừng trở lại</h2>
+          <p className="text-gray-500 text-sm">Đăng nhập để tiếp tục trải nghiệm cùng LUXUS</p>
+        </div>
+
+        {error && <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm mb-6 text-center border border-red-100">{error}</div>}
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Email của bạn</label>
+            <input 
+              type="email" 
+              value={email} 
+              onChange={e => setEmail(e.target.value)} 
+              required 
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-DEFAULT/20 focus:border-brand-DEFAULT transition-all outline-none"
+              placeholder="example@email.com"
+            />
           </div>
-          <div style={styles.field}>
-            <label style={styles.label}>Mật khẩu</label>
-            <input style={styles.input} type="password" value={password}
-              onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide">Mật khẩu</label>
+              <a href="#" className="text-xs text-brand-DEFAULT font-medium hover:underline">Quên mật khẩu?</a>
+            </div>
+            <input 
+              type="password" 
+              value={password} 
+              onChange={e => setPassword(e.target.value)} 
+              required 
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-DEFAULT/20 focus:border-brand-DEFAULT transition-all outline-none"
+              placeholder="••••••••"
+            />
           </div>
-          <button type="submit" style={styles.btn} disabled={loading}>
-            {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full py-3.5 bg-brand-dark text-white rounded-lg font-bold tracking-wide uppercase hover:bg-brand-DEFAULT transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed mt-2"
+          >
+            {loading ? 'ĐANG XỬ LÝ...' : 'ĐĂNG NHẬP'}
           </button>
         </form>
-        <p style={styles.footer}>
-          Chưa có tài khoản? <Link to="/register" style={styles.linkText}>Đăng ký ngay</Link>
+
+        <p className="text-center text-sm text-gray-500 mt-8">
+          Chưa có tài khoản? <Link to="/register" className="text-brand-DEFAULT font-bold hover:underline">Đăng ký ngay</Link>
         </p>
       </div>
     </div>
   );
-};
-
-const styles: Record<string, React.CSSProperties> = {
-  page: { minHeight: '100vh', display: 'flex', alignItems: 'center',
-    justifyContent: 'center', background: '#f5f5f5' },
-  card: { background: '#fff', padding: 40, borderRadius: 16, width: 400,
-    boxShadow: '0 8px 32px rgba(0,0,0,0.12)' },
-  title: { margin: '0 0 6px', fontSize: 26, color: '#1a1a2e', fontWeight: 700 },
-  sub: { margin: '0 0 24px', color: '#888', fontSize: 14 },
-  error: { background: '#fff0f0', border: '1px solid #ffcccc', color: '#c0392b',
-    padding: '10px 14px', borderRadius: 8, marginBottom: 16, fontSize: 14 },
-  form: { display: 'flex', flexDirection: 'column', gap: 16 },
-  field: { display: 'flex', flexDirection: 'column', gap: 6 },
-  label: { fontSize: 13, fontWeight: 600, color: '#444' },
-  input: { padding: '10px 14px', borderRadius: 8, border: '1px solid #ddd',
-    fontSize: 14, outline: 'none' },
-  btn: { background: '#e94560', color: '#fff', border: 'none', padding: '12px',
-    borderRadius: 8, fontSize: 15, fontWeight: 700, cursor: 'pointer', marginTop: 8 },
-  footer: { textAlign: 'center', marginTop: 20, fontSize: 14, color: '#888' },
-  linkText: { color: '#e94560', fontWeight: 600, textDecoration: 'none' },
 };
 
 export default LoginPage;
