@@ -142,7 +142,7 @@ const BookingPage: React.FC = () => {
 
           <div style={styles.roomCard}>
             <div style={styles.imgBox}>
-               {room.imageUrl ? <img src={room.imageUrl} alt={room.name} style={styles.roomImg} /> : <div style={styles.placeholder}>LUXUS</div>}
+               {room.imageUrl ? <img src={room.imageUrl} alt={room.name} style={styles.roomImg} /> : <div style={styles.placeholder}>BOOKINGHOTEL</div>}
             </div>
             <div style={styles.roomInfo}>
                <h4 style={styles.roomName}>{room.name}</h4>

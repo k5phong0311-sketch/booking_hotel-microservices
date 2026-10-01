@@ -24,9 +24,9 @@ const Navbar: React.FC = () => {
         {/* Brand */}
         <Link to="/" className="flex items-center gap-2">
           <div className="w-8 h-8 bg-brand-dark rounded-sm flex items-center justify-center">
-            <span className="text-white font-serif font-bold text-lg leading-none">L</span>
+            <span className="text-white font-serif font-bold text-lg leading-none">B</span>
           </div>
-          <span className="font-serif font-bold text-2xl text-brand-dark tracking-wide">LUXUS.</span>
+          <span className="font-serif font-bold text-2xl text-brand-dark tracking-wide">BOOKINGHOTEL.</span>
         </Link>
 
         {/* Menu */}

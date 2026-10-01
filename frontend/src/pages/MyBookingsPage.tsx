@@ -48,7 +48,7 @@ const MyBookingsPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 pt-24 pb-20">
       <div className="max-w-5xl mx-auto px-6">
         <h1 className="text-3xl font-serif font-bold text-gray-900 mb-2">Chuyến đi của tôi</h1>
-        <p className="text-gray-500 mb-8">Quản lý các đặt phòng và lịch sử lưu trú của bạn tại LUXUS.</p>
+        <p className="text-gray-500 mb-8">Quản lý các đặt phòng và lịch sử lưu trú của bạn tại BOOKINGHOTEL.</p>
 
         {location.state?.newBookingId && (
           <div className="bg-accent-light/20 border border-accent-DEFAULT/30 text-accent-dark p-4 rounded-xl mb-8 flex items-center gap-3">

@@ -27,7 +27,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onBook }) => {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400 font-serif text-2xl tracking-widest">
-            LUXUS
+            BOOKINGHOTEL
           </div>
         )}
         

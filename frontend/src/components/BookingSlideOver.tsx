@@ -101,7 +101,7 @@ const BookingSlideOver: React.FC<BookingSlideOverProps> = ({ room, onClose }) =>
               {room.imageUrl ? (
                 <img src={room.imageUrl} alt={room.name} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400 font-serif text-xl">LUXUS</div>
+                <div className="w-full h-full flex items-center justify-center text-gray-400 font-serif text-xl">BOOKINGHOTEL</div>
               )}
             </div>
             <h3 className="text-2xl font-serif font-bold text-gray-900 mb-1">{room.name}</h3>
