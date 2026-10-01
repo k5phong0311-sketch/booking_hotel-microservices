@@ -17,10 +17,27 @@ const App: React.FC = () => {
     <BrowserRouter>
       <AuthProvider>
         <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+          
           * { box-sizing: border-box; }
-          body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+          body { 
+            margin: 0; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #0b0c10;
+            color: #e0e0e0;
+          }
+          h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif;
+            color: #c5a059;
+          }
           a { text-decoration: none; }
           @keyframes spin { to { transform: rotate(360deg); } }
+          
+          /* Tùy chỉnh thanh cuộn cho hợp tông dark */
+          ::-webkit-scrollbar { width: 8px; }
+          ::-webkit-scrollbar-track { background: #0b0c10; }
+          ::-webkit-scrollbar-thumb { background: #c5a059; border-radius: 4px; }
+          ::-webkit-scrollbar-thumb:hover { background: #a88540; }
         `}</style>
         <Navbar />
         <Routes>
