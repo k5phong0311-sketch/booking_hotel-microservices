@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -8,13 +8,14 @@
   --color-accent-DEFAULT: #10B981;
   --color-accent-dark: #059669;
   
-  --font-sans: 'Inter', sans-serif;
+  /* Sử dụng độc nhất Playfair Display cho toàn hệ thống */
   --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Playfair Display', serif;
 }
 
 @layer base {
   body {
-    @apply font-sans bg-gray-50 text-gray-900;
+    @apply font-serif bg-gray-50 text-gray-900;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif text-brand-dark;
