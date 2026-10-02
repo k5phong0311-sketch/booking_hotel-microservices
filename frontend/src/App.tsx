@@ -14,6 +14,7 @@ import MyBookingsPage from './pages/MyBookingsPage';
 import ProfilePage from './pages/ProfilePage';
 import PaymentCallbackPage from './pages/PaymentCallbackPage';
 import ChatWidget from './components/ChatWidget';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 
 const App: React.FC = () => {
   return (
@@ -37,6 +38,9 @@ const App: React.FC = () => {
           } />
           <Route path="/profile" element={
             <PrivateRoute><ProfilePage /></PrivateRoute>
+          } />
+          <Route path="/admin" element={
+            <PrivateRoute><AdminDashboardPage /></PrivateRoute>
           } />
           <Route path="/payment/callback" element={
             <PaymentCallbackPage />
