@@ -26,13 +26,13 @@ const Navbar: React.FC = () => {
           <div className="w-8 h-8 bg-brand-dark rounded-sm flex items-center justify-center">
             <span className="text-white font-serif font-bold text-lg leading-none">B</span>
           </div>
-          <span className="font-serif font-bold text-2xl text-brand-dark tracking-wide">BOOKINGHOTEL.</span>
+          <span className="font-serif font-bold text-2xl text-brand-dark tracking-wide">BOOKINGHOTEL</span>
         </Link>
 
         {/* Menu */}
         <div className="hidden md:flex items-center gap-8">
-          <Link to="/" className="text-sm font-medium text-gray-600 hover:text-brand-DEFAULT transition-colors uppercase tracking-wider">Khám Phá</Link>
-          <Link to="/about" className="text-sm font-medium text-gray-600 hover:text-brand-DEFAULT transition-colors uppercase tracking-wider">Về Chúng Tôi</Link>
+          <Link to="/" className="text-sm font-medium text-gray-600 hover:text-brand-DEFAULT transition-colors uppercase tracking-wider">Khám phá</Link>
+          <Link to="/about" className="text-sm font-medium text-gray-600 hover:text-brand-DEFAULT transition-colors uppercase tracking-wider">Về chúng tôi</Link>
           
           <div className="w-px h-6 bg-gray-200"></div>
 
