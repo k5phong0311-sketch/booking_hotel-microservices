@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
 import api from '../services/api';
 
@@ -9,7 +9,7 @@ const AdminDashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'rooms' | 'users' | 'chat'>('dashboard');
   
   const [voucherCode, setVoucherCode] = useState('');
-  const [voucherValue, setVoucherValue] = useState(20);
+  const [voucherValue, setVoucherValue] = useState(0);
   const [quantity, setQuantity] = useState(50);
   const [statusMsg, setStatusMsg] = useState('');
 
@@ -64,15 +64,14 @@ const AdminDashboardPage: React.FC = () => {
       bks.forEach((b: any) => { if (b.status !== 'CANCELLED') rev += Number(b.totalPrice); });
       setTotalRevenue(rev);
 
-      // Generate mock chart data based on real bookings if possible
       setRevenueData([
-        { name: 'T2', revenue: rev * 0.1, bookings: bks.length },
-        { name: 'T3', revenue: rev * 0.15, bookings: bks.length + 1 },
-        { name: 'T4', revenue: rev * 0.2, bookings: bks.length + 2 },
-        { name: 'T5', revenue: rev * 0.1, bookings: bks.length },
-        { name: 'T6', revenue: rev * 0.25, bookings: bks.length + 3 },
-        { name: 'T7', revenue: rev * 0.15, bookings: bks.length + 4 },
-        { name: 'CN', revenue: rev * 0.05, bookings: bks.length + 1 },
+        { name: 'Mon', revenue: rev * 0.1, bookings: bks.length },
+        { name: 'Tue', revenue: rev * 0.15, bookings: bks.length + 1 },
+        { name: 'Wed', revenue: rev * 0.2, bookings: bks.length + 2 },
+        { name: 'Thu', revenue: rev * 0.1, bookings: bks.length },
+        { name: 'Fri', revenue: rev * 0.25, bookings: bks.length + 3 },
+        { name: 'Sat', revenue: rev * 0.15, bookings: bks.length + 4 },
+        { name: 'Sun', revenue: rev * 0.05, bookings: bks.length + 1 },
       ]);
     } catch (err) {
       console.error(err);
@@ -204,7 +203,7 @@ const AdminDashboardPage: React.FC = () => {
               {users.map(u => (
                 <tr key={u.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-gray-500">#{u.id}</td>
-                  <td className="px-6 py-4 font-bold text-gray-900">{u.name}</td>
+                  <td className="px-6 py-4 font-bold text-gray-900">{u.fullName || u.name}</td>
                   <td className="px-6 py-4">{u.email}</td>
                   <td className="px-6 py-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold ${u.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
@@ -240,7 +239,7 @@ const AdminDashboardPage: React.FC = () => {
               <div ref={messagesEndRef} />
             </div>
             <form onSubmit={handleSendReply} className="p-4 bg-white border-t border-gray-100 flex gap-2">
-              <input type="text" value={chatInput} onChange={e => setChatInput(e.target.value)} placeholder="Nhập câu trả lời..." className="flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none" />
+              <input type="text" value={chatInput} onChange={e => setChatInput(e.target.value)} placeholder="Loại a reply..." className="flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none" />
               <button type="submit" className="px-6 py-2 bg-brand-dark text-white font-bold rounded-lg">Gửi</button>
             </form>
           </div>

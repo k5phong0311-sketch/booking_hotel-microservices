@@ -56,11 +56,11 @@ const ChatWidget: React.FC = () => {
       }]);
     });
 
-    setMessages([{
-      id: 'welcome',
-      sender: 'ai',
-      text: 'Xin chào! Tôi là Lễ tân ảo của BOOKINGHOTEL. Tôi có thể giúp gì cho bạn hôm nay?',
-      time: new Date()
+    setMessages([{ 
+      id: 'welcome', 
+      sender: 'ai', 
+      text: 'Xin chào! Tôi là Lễ tân ảo của BOOKINGHOTEL. Tôi có thể giúp gì cho bạn hôm nay?', 
+      time: new Date() 
     }]);
 
     return () => {
@@ -124,10 +124,10 @@ const ChatWidget: React.FC = () => {
                   <div className="text-xs text-gray-400 italic text-center w-full my-2">{msg.text}</div>
                 ) : (
                   <>
-                    <span className="text-[10px] text-gray-400 mb-1 ml-1">{msg.sender === 'user' ? 'Bạn' : msg.sender === 'ai' ? 'AI' : 'CSKH'}</span>
-                    <div className={`px-3 py-2 rounded-xl text-sm ${msg.sender === 'user' ? 'bg-brand-DEFAULT text-white rounded-tr-none' : msg.sender === 'human' ? 'bg-orange-100 text-gray-900 rounded-tl-none border border-orange-200' : 'bg-white text-gray-900 rounded-tl-none border border-gray-200'}`}>
-                      {msg.text}
-                    </div>
+                  <span className="text-[10px] text-gray-400 mb-1 ml-1">{msg.sender === 'user' ? 'Bạn' : msg.sender === 'ai' ? 'AI' : 'CSKH'}</span>
+                  <div className={`px-3 py-2 rounded-xl text-sm ${msg.sender === 'user' ? 'bg-brand-DEFAULT text-white rounded-tr-none' : msg.sender === 'human' ? 'bg-orange-100 text-gray-900 rounded-tl-none border border-orange-200' : 'bg-white text-gray-900 rounded-tl-none border border-gray-200'}`}>
+                    {msg.text}
+                  </div>
                   </>
                 )}
               </div>

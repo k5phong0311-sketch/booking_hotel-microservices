@@ -3,7 +3,7 @@ const mysql = require('mysql2/promise');
 
 async function seedAdmin() {
   const connection = await mysql.createConnection({
-    host: 'localhost',
+    host: 'hotel_booking_mysql',
     port: 3306,
     user: 'hotel_user',
     password: 'hotel_password',
@@ -12,7 +12,7 @@ async function seedAdmin() {
 
   const email = 'admin@hotel.com';
   const plainPassword = 'password123';
-  const fullName = 'Trương Văn Phong (Admin)';
+  const fullName = 'Tr\u01b0\u01a1ng V\u0103n Phong (Admin)';
   const role = 'ADMIN';
 
   // Hash password
@@ -21,16 +21,16 @@ async function seedAdmin() {
   // Check if exists
   const [rows] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
   if (rows.length > 0) {
-    console.log('Tài khoản admin đã tồn tại!');
-    await connection.execute('UPDATE users SET role = "ADMIN" WHERE email = ?', [email]);
-    console.log('Đã đảm bảo quyền ADMIN.');
+    console.log('Admin account already exists!');
+    await connection.execute('UPDATE users SET role = "ADMIN", fullName = ? WHERE email = ?', [fullName, email]);
+    console.log('Ensured ADMIN role and correct name.');
   } else {
     // Insert
     await connection.execute(
       'INSERT INTO users (email, password, fullName, role) VALUES (?, ?, ?, ?)',
       [email, hashedPassword, fullName, role]
     );
-    console.log(`Đã tạo thành công tài khoản Admin:\n- Email: ${email}\n- Pass: ${plainPassword}`);
+    console.log(`Successfully created Admin account:\n- Email: ${email}\n- Pass: ${plainPassword}`);
   }
 
   await connection.end();

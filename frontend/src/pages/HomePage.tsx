@@ -1,9 +1,9 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { roomService } from '../services/room.service';
 import { Room } from '../types';
 import RoomCard from '../components/RoomCard';
 import LoadingSpinner from '../components/LoadingSpinner';
-import BookingSlideOver from '../components/BookingSlideOver'; // Component má»›i sáº½ táº¡o sau
+import BookingSlideOver from '../components/BookingSlideOver';
 
 const HomePage: React.FC = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -11,46 +11,42 @@ const HomePage: React.FC = () => {
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('ALL');
   
-  // State quáº£n lÃ½ Slide-over
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
 
   useEffect(() => {
     roomService.getAll()
       .then(data => setRooms(data))
-      .catch(() => setError('Lá»—i káº¿t ná»‘i Ä‘áº¿n mÃ¡y chá»§.'))
+      .catch(() => setError('Lỗi kết nối đến máy chủ.'))
       .finally(() => setLoading(false));
   }, []);
 
   const types = ['ALL', 'SINGLE', 'DOUBLE', 'SUITE', 'DELUXE'];
   const typeLabel: Record<string, string> = {
-    ALL: 'Táº¥t Cáº£', SINGLE: 'PhÃ²ng ÄÆ¡n', DOUBLE: 'PhÃ²ng ÄÃ´i', SUITE: 'Suite ThÆ°á»£ng Háº¡ng', DELUXE: 'PhÃ²ng Deluxe'
+    ALL: 'Tất Cả', SINGLE: 'Phòng Đơn', DOUBLE: 'Phòng Đôi', SUITE: 'Suite Thượng Hạng', DELUXE: 'Phòng Deluxe'
   };
 
   const filtered = filter === 'ALL' ? rooms : rooms.filter(r => r.type === filter);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Hero Banner - Bright & Airy */}
-      <section className="relative h-[85vh] min-h-[600px] flex items-center justify-center bg-gray-100 overflow-hidden">
-        {/* Background Image with Light Overlay */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=2000&auto=format&fit=crop")' }}
-        ></div>
-        <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]"></div>
+    <div className="bg-gray-50 min-h-screen pb-20">
+      {/* Hero Section */}
+      <section className="relative pt-24 pb-32 overflow-hidden flex flex-col items-center justify-center min-h-[85vh]">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1542314831-c6a4d1424869?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center bg-no-repeat opacity-40"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-white/90 via-white/70 to-gray-50"></div>
+        <div className="absolute inset-0 bg-brand-light/10"></div>
         
         {/* Hero Content */}
         <div className="relative z-10 text-center max-w-4xl px-6 mt-16">
-          <span className="block text-brand-dark font-semibold tracking-[4px] uppercase text-sm mb-6">Äáº¶T PHÃ’NG KHÃCH Sáº N TRá»°C TUYáº¾N</span>
+          <span className="block text-brand-dark font-semibold tracking-[4px] uppercase text-sm mb-6">ĐẶT PHÒNG KHÁCH SẠN TRỰC TUYẾN</span>
           <h1 className="text-5xl md:text-7xl font-serif font-bold text-gray-900 leading-tight mb-8 drop-shadow-sm">
-            Tráº£i nghiá»‡m lÆ°u trÃº <br className="hidden md:block" />
-            <span className="text-brand-dark">hoÃ n háº£o</span> cho ká»³ nghá»‰ cá»§a báº¡n.
+            Trải nghiệm lưu trú <br className="hidden md:block" />
+            <span className="text-brand-dark">hoàn hảo</span> cho kỳ nghỉ của bạn.
           </h1>
           <p className="text-lg md:text-xl text-gray-800 font-medium max-w-2xl mx-auto mb-10">
-            HÃ ng ngÃ n lá»±a chá»n phÃ²ng nghá»‰ tiá»‡n nghi, giÃ¡ tá»‘t vÃ  dá»‹ch vá»¥ chÄƒm sÃ³c khÃ¡ch hÃ ng 24/7.
+            Hàng ngàn lựa chọn phòng nghỉ tiện nghi, giá tốt và dịch vụ chăm sóc khách hàng 24/7.
           </p>
           <a href="#discover" className="inline-block bg-brand-dark text-white font-medium px-8 py-4 rounded hover:bg-brand-DEFAULT transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
-            Xem phÃ²ng trá»‘ng ngay
+            Xem phòng trống ngay
           </a>
         </div>
       </section>
@@ -58,19 +54,19 @@ const HomePage: React.FC = () => {
       {/* Discovery Section */}
       <section id="discover" className="max-w-7xl mx-auto px-6 pt-24">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-4">Danh SÃ¡ch PhÃ²ng Nghá»‰</h2>
+          <h2 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-4">Danh Sách Phòng Nghỉ</h2>
           <div className="w-16 h-1 bg-accent mx-auto mb-8 rounded"></div>
           
           {/* Filters */}
           <div className="flex flex-wrap justify-center gap-3">
             {types.map(t => (
-              <button 
-                key={t} 
+              <button
+                key={t}
                 onClick={() => setFilter(t)}
-                className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
+                className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all ${
                   filter === t 
-                  ? 'bg-brand-dark text-white shadow-md' 
-                  : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+                    ? 'bg-brand-dark text-white shadow-md' 
+                    : 'bg-white text-gray-600 hover:bg-brand-light/50 border border-gray-200'
                 }`}
               >
                 {typeLabel[t]}
@@ -79,7 +75,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
 
-        {loading && <LoadingSpinner text="Äang táº£i danh sÃ¡ch phÃ²ng..." />}
+        {loading && <LoadingSpinner text="Đang tải danh sách phòng..." />}
         {error && (
           <div className="bg-red-50 text-red-600 p-4 rounded-lg text-center max-w-2xl mx-auto border border-red-100">
             {error}
@@ -89,21 +85,17 @@ const HomePage: React.FC = () => {
         {!loading && !error && (
           <>
             <p className="text-gray-500 mb-8 font-medium">
-              TÃ¬m tháº¥y <span className="text-brand-dark font-bold">{filtered.length}</span> khÃ´ng gian phÃ¹ há»£p
+              Tìm thấy <span className="text-brand-dark font-bold">{filtered.length}</span> không gian phù hợp
             </p>
             
             {filtered.length === 0 ? (
               <div className="text-center py-20 text-gray-500 bg-white rounded-2xl border border-gray-100">
-                KhÃ´ng cÃ³ phÃ²ng nÃ o phÃ¹ há»£p vá»›i lá»±a chá»n cá»§a quÃ½ khÃ¡ch.
+                Không có phòng nào phù hợp với lựa chọn của quý khách.
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filtered.map(room => (
-                  <RoomCard 
-                    key={room.id} 
-                    room={room} 
-                    onBook={() => setSelectedRoom(room)} 
-                  />
+                  <RoomCard key={room.id} room={room} onBook={() => setSelectedRoom(room)} />
                 ))}
               </div>
             )}
@@ -112,9 +104,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Slide-over Booking Component */}
-      {selectedRoom && (
-        <BookingSlideOver isOpen={!!selectedRoom} room={selectedRoom} onClose={() => setSelectedRoom(null)} />
-      )}
+      <BookingSlideOver isOpen={!!selectedRoom} room={selectedRoom} onClose={() => setSelectedRoom(null)} />
     </div>
   );
 };
