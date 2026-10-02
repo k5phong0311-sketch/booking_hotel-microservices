@@ -40,7 +40,7 @@ const Navbar: React.FC = () => {
             <div className="flex items-center gap-6">
               <Link to="/my-bookings" className="text-sm font-medium text-gray-600 hover:text-brand-DEFAULT transition-colors">Lịch sử đặt phòng</Link>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-brand-light flex items-center justify-center text-brand-dark font-bold">
+                <div className="w-8 h-8 rounded-full bg-brand-light flex items-center justify-center text-brand-dark font-medium">
                   {user?.fullName?.charAt(0).toUpperCase() || 'U'}
                 </div>
                 <span className="text-sm font-medium text-gray-900">{user?.fullName}</span>
@@ -55,7 +55,7 @@ const Navbar: React.FC = () => {
           ) : (
             <div className="flex items-center gap-4">
               <Link to="/login" className="text-sm font-medium text-gray-700 hover:text-brand-DEFAULT transition-colors">Đăng nhập</Link>
-              <Link to="/register" className="text-sm font-semibold bg-brand-dark text-white px-5 py-2.5 rounded hover:bg-brand-DEFAULT transition-colors tracking-wide">ĐĂNG KÝ</Link>
+              <Link to="/register" className="text-sm font-medium bg-brand-dark text-white px-5 py-2 rounded hover:bg-brand-DEFAULT transition-colors shadow-sm">Đăng ký</Link>
             </div>
           )}
         </div>
