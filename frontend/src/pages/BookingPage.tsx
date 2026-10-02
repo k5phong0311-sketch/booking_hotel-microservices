@@ -32,7 +32,7 @@ const BookingPage: React.FC = () => {
 
   useEffect(() => {
     if (roomId) {
-      roomService.getById(Number(roomId))
+      roomService.getOne(Number(roomId))
         .then(data => { setRoom(data); setLoading(false); })
         .catch(() => { setError('Kh\u00f4ng t\u00ecm th\u1ea5y ph\u00f2ng.'); setLoading(false); });
     }

@@ -20,6 +20,10 @@ const RoomDetailPage: React.FC = () => {
       .finally(() => setLoading(false));
   }, [id]);
 
+  const handleAskCSKH = () => {
+    window.dispatchEvent(new CustomEvent('open-chatwidget'));
+  };
+
   const handleBook = () => {
     if (!isAuthenticated) {
       navigate('/login');
@@ -62,13 +66,18 @@ const RoomDetailPage: React.FC = () => {
               <span style={styles.perNight}>/đêm</span>
             </div>
 
-            <button onClick={handleBook}
-              disabled={!room.isAvailable}
-              style={{ ...styles.bookBtn, opacity: room.isAvailable ? 1 : 0.5 }}>
-              {room.isAvailable
-                ? (isAuthenticated ? '📅 Đặt phòng ngay' : '🔐 Đăng nhập để đặt phòng')
-                : 'Phòng đã hết'}
-            </button>
+            <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+              <button onClick={handleBook}
+                disabled={!room.isAvailable}
+                style={{ ...styles.bookBtn, opacity: room.isAvailable ? 1 : 0.5, flex: 1 }}>
+                {room.isAvailable
+                  ? (isAuthenticated ? '📅 Đặt phòng ngay' : '🔐 Đăng nhập để đặt phòng')
+                  : 'Phòng đã hết'}
+              </button>
+              <button onClick={handleAskCSKH} style={styles.askBtn}>
+                💬 Hỏi CSKH
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -99,6 +108,7 @@ const styles: Record<string, React.CSSProperties> = {
   priceBox: { display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 8 },
   price: { fontSize: 32, fontWeight: 800, color: '#e94560' },
   perNight: { fontSize: 16, color: '#888' },
+  askBtn: { background: '#2c3e50', color: '#fff', border: 'none', padding: '14px 20px', borderRadius: 10, fontSize: 16, fontWeight: 700, cursor: 'pointer' },
   bookBtn: { background: '#e94560', color: '#fff', border: 'none', padding: '14px 0',
     borderRadius: 10, fontSize: 16, fontWeight: 700, cursor: 'pointer', marginTop: 8 },
 };
