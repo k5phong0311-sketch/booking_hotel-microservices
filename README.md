@@ -16,7 +16,7 @@ Hệ thống đặt phòng khách sạn được xây dựng theo kiến trúc *
 | **User & Auth Service** | Trần Đức Hải | `feat/user-auth` | ✅ | ✅ | ✅ | ⬜ | 🟡 Đang làm |
 | **Room Catalog Service** | Nguyễn Thành Hưng | `feat/room-catalog` | ✅ | ✅ | ✅ | ⬜ | 🟡 Đang làm |
 | **Booking Service** | Bùi Đại Dương | `feat/booking-service` | ✅ | ✅ | ✅ | ⬜ | 🟡 Đang làm |
-| **Payment & Notification** | Đậu Ngọc Anh | `feat/payment-notification` | ✅ | ✅ | ✅ | ⬜ | 🟡 Đang làm |
+| **Payment & Notification** | Đậu Ngọc Anh | `feat/payment-notification` | ✅ | ✅ | ✅ | ✅ | 🟢 Hoàn thiện |
 | **Frontend (React)** | Cả nhóm | `feat/frontend` | ✅ | ✅ | ✅ | ⬜ | 🟡 Đang làm |
 
 **Chú thích trạng thái:**
