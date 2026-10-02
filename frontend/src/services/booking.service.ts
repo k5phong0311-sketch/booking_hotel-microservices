@@ -22,6 +22,11 @@ export const bookingService = {
     return res.data;
   },
 
+  updateStatus: async (id: number, status: string): Promise<Booking> => {
+    const res = await api.patch<Booking>(`/bookings/${id}/status`, { status });
+    return res.data;
+  },
+
   cancel: async (id: number): Promise<Booking> => {
     const res = await api.patch<Booking>(`/bookings/${id}/cancel`);
     return res.data;

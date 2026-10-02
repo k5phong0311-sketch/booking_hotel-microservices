@@ -84,7 +84,7 @@ const BookingSlideOver: React.FC<Props> = ({ isOpen, onClose, room }) => {
               {room.imageUrl ? <img src={room.imageUrl} alt={room.name} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-gray-400 font-serif text-xl">BOOKINGHOTEL</div>}
             </div>
             <h3 className="text-2xl font-serif font-bold text-gray-900 mb-1">{room.name}</h3>
-            <p className="text-sm text-brand-DEFAULT font-semibold uppercase tracking-wide mb-2">{room.type} • Tầng {room.floor}</p>
+            <p className="text-sm text-brand-DEFAULT font-semibold uppercase tracking-wide mb-2">{room.type} \u2022 Tầng {room.floor}</p>
             <p className="text-gray-500 text-sm">{room.description}</p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -109,9 +109,9 @@ const BookingSlideOver: React.FC<Props> = ({ isOpen, onClose, room }) => {
             </div>
             {nights > 0 && (
               <div className="mt-6 bg-brand-light/50 p-5 rounded-xl border border-brand-DEFAULT/10">
-                <div className="flex justify-between text-sm text-gray-600 mb-2"><span>Thời gian lưu trú:</span><span className="font-medium">{nights} đêm</span></div>
-                <div className="flex justify-between text-sm text-gray-600 mb-4"><span>Giá mỗi đêm:</span><span className="font-medium">{Number(room.pricePerNight).toLocaleString('vi-VN')} VND</span></div>
-                <div className="border-t border-brand-DEFAULT/10 pt-4 flex justify-between items-end"><span className="font-bold text-gray-900">TỔNG TIỀN:</span><span className="text-2xl font-bold text-brand-dark font-serif">{totalPrice.toLocaleString('vi-VN')} VND</span></div>
+                <div className="flex justify-between text-sm text-gray-600 mb-2"><span>Thời gian lưu trú::</span><span className="font-medium">{nights} đêm</span></div>
+                <div className="flex justify-between text-sm text-gray-600 mb-4"><span>Giá mỗi đêm::</span><span className="font-medium">{Number(room.pricePerNight).toLocaleString('vi-VN')} VND</span></div>
+                <div className="border-t border-brand-DEFAULT/10 pt-4 flex justify-between items-end"><span className="font-bold text-gray-900">TỔNG TIỀN::</span><span className="text-2xl font-bold text-brand-dark font-serif">{totalPrice.toLocaleString('vi-VN')} VND</span></div>
               </div>
             )}
             <button type="submit" disabled={submitting || nights <= 0 || !user} className={`w-full py-4 rounded-xl text-sm font-bold tracking-wide uppercase mt-4 ${(!user || nights <= 0) ? 'bg-gray-200 text-gray-400' : 'bg-brand-dark text-white hover:bg-brand-DEFAULT'}`}>

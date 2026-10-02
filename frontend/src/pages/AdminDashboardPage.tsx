@@ -105,6 +105,27 @@ const AdminDashboardPage: React.FC = () => {
     }
   };
 
+
+  const handleConfirmBooking = async (id: number) => {
+    try {
+      await bookingService.updateStatus(id, 'CONFIRMED');
+      fetchData();
+    } catch(err) {
+      alert('Đã xảy ra lỗi');
+    }
+  };
+
+  const handleCancelBooking = async (id: number) => {
+    if(confirm('Bạn muốn hủy đơn này?')) {
+      try {
+        await bookingService.cancel(id);
+        fetchData();
+      } catch(err) {
+        alert('Đã xảy ra lỗi');
+      }
+    }
+  };
+
   const handleDeleteRoom = async (id: number) => {
     if (confirm('__CONFIRM_DELETE__')) {
       await roomService.deleteRoom(id);
@@ -292,6 +313,15 @@ const AdminDashboardPage: React.FC = () => {
                       {b.status}
                     </span>
                   </td>
+
+                  <td className="px-6 py-4 flex space-x-2">
+                    {b.status === 'PENDING' && (
+                      <button onClick={() => handleConfirmBooking(b.id)} className="text-green-600 font-bold text-sm">Xác nhận</button>
+                    )}
+                    {b.status !== 'CANCELED' && (
+                      <button onClick={() => handleCancelBooking(b.id)} className="text-red-600 font-bold text-sm">Hủy</button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -321,6 +351,7 @@ const AdminDashboardPage: React.FC = () => {
                       {u.role}
                     </span>
                   </td>
+
                 </tr>
               ))}
             </tbody>
