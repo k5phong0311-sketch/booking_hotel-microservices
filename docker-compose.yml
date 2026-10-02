@@ -15,6 +15,88 @@ services:
       - mysql_data:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  user-service:
+    build: ./user-service
+    container_name: hotel_user_service
+    restart: always
+    environment:
+      - DB_HOST=mysql
+      - JWT_SECRET=super_secret_key_123
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  room-service:
+    build: ./room-service
+    container_name: hotel_room_service
+    restart: always
+    environment:
+      - DB_HOST=mysql
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  booking-service:
+    build: ./booking-service
+    container_name: hotel_booking_service
+    restart: always
+    environment:
+      - DB_HOST=mysql
+      - ROOM_SERVICE_URL=http://room-service:3000
+      - PAYMENT_SERVICE_URL=http://payment-service:3000
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  payment-service:
+    build: ./payment-service
+    container_name: hotel_payment_service
+    restart: always
+    environment:
+      - DB_HOST=mysql
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: hotel_api_gateway
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=mysql
+      - JWT_SECRET=super_secret_key_123
+      - USER_SERVICE_URL=http://user-service:3000
+      - ROOM_SERVICE_URL=http://room-service:3000
+      - BOOKING_SERVICE_URL=http://booking-service:3000
+      - PAYMENT_SERVICE_URL=http://payment-service:3000
+      # - GEMINI_API_KEY=your_key_here
+    depends_on:
+      mysql:
+        condition: service_healthy
+      user-service:
+        condition: service_started
+      room-service:
+        condition: service_started
+      booking-service:
+        condition: service_started
+      payment-service:
+        condition: service_started
+
+  frontend:
+    build: ./frontend
+    container_name: hotel_frontend
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - api-gateway
 
 volumes:
   mysql_data:
