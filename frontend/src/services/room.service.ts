@@ -16,4 +16,14 @@ export const roomService = {
     const res = await api.get(`/rooms/${id}/availability`);
     return res.data;
   },
+  
+  createRoom: async (roomData: Partial<Room>) => {
+    const res = await api.post('/rooms', roomData);
+    return res.data;
+  },
+
+  deleteRoom: async (id: number) => {
+    const res = await api.delete(`/rooms/${id}`);
+    return res.data;
+  }
 };

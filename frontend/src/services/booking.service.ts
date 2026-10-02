@@ -7,6 +7,11 @@ export const bookingService = {
     return res.data;
   },
 
+  getAllBookings: async (): Promise<Booking[]> => {
+    const res = await api.get<Booking[]>('/bookings');
+    return res.data;
+  },
+
   getMyBookings: async (userId: number): Promise<Booking[]> => {
     const res = await api.get<Booking[]>(`/bookings/user/${userId}`);
     return res.data;
