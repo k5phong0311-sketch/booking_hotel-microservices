@@ -18,6 +18,12 @@ const ChatWidget: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const handleOpenChat = (e: any) => {
+      setIsOpen(true);
+      if (e.detail) setInput(e.detail);
+    };
+    window.addEventListener('openChat', handleOpenChat);
+
     socketRef.current = io('http://localhost:3000/chat');
 
     socketRef.current.on('connect', () => {
@@ -64,6 +70,8 @@ const ChatWidget: React.FC = () => {
     }]);
 
     return () => {
+      window.removeEventListener('openChat', handleOpenChat);
+
       socketRef.current?.disconnect();
     };
   }, []);

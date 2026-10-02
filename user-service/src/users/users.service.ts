@@ -33,9 +33,17 @@ export class UsersService {
     // Chỉ cập nhật những field được cung cấp
     if (dto.fullName) user.fullName = dto.fullName;
     if (dto.phone !== undefined) user.phone = dto.phone;
+    if (dto.role) user.role = dto.role as any;
 
     const updated = await this.userRepo.save(user);
     return this._exclude(updated);
+  }
+
+  async remove(id: number) {
+    const user = await this.userRepo.findOne({ where: { id } });
+    if (!user) throw new NotFoundException();
+    await this.userRepo.remove(user);
+    return { success: true };
   }
 
   // Loại bỏ password khỏi response

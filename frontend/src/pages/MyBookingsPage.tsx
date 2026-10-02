@@ -8,6 +8,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 
 const MyBookingsPage: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [showQR, setShowQR] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const location = useLocation();
@@ -47,6 +48,23 @@ const MyBookingsPage: React.FC = () => {
   };
 
   return (
+    <>
+
+      {showQR !== null && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center relative shadow-2xl">
+            <button onClick={() => setShowQR(null)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <h2 className="text-2xl font-serif font-bold text-brand-dark mb-1">Thẻ Phòng Online</h2>
+            <p className="text-gray-500 text-sm mb-6">Booking #{showQR}</p>
+            <div className="border-4 border-brand-DEFAULT p-4 rounded-xl inline-block mb-6 shadow-sm bg-gray-50">
+              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=BOOKING_${showQR}`} alt="QR Code" className="w-48 h-48" />
+            </div>
+            <p className="font-bold text-gray-800">Quét mã này tại quầy lễ tân để nhận phòng nhanh chóng!</p>
+          </div>
+        </div>
+      )}
     <div className="min-h-screen bg-gray-50 pt-24 pb-20">
       <div className="max-w-5xl mx-auto px-6">
         <h1 className="text-3xl font-serif font-bold text-gray-900 mb-2">Chuyến đi của tôi</h1>
@@ -107,6 +125,16 @@ const MyBookingsPage: React.FC = () => {
                       <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Tổng thanh toán</p>
                       <p className="text-xl font-bold text-brand-dark font-serif">{Number(booking.totalPrice).toLocaleString('vi-VN')} đ</p>
                     </div>
+                    
+                    {booking.status === 'CONFIRMED' && (
+                      <button 
+                        onClick={() => setShowQR(booking.id)}
+                        className="text-sm font-bold text-brand-dark hover:text-brand-DEFAULT hover:underline px-2 py-1 mr-4"
+                      >
+                        Xem thẻ phòng
+                      </button>
+                    )}
+
                     {(booking.status === 'PENDING' || booking.status === 'CONFIRMED') && (
                       <button 
                         onClick={() => handleCancel(booking.id)}
@@ -123,6 +151,7 @@ const MyBookingsPage: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

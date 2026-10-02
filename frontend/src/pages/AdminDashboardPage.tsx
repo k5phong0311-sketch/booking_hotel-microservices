@@ -4,6 +4,7 @@ import { io, Socket } from 'socket.io-client';
 import { useAuth } from '../context/AuthContext';
 import { roomService } from '../services/room.service';
 import { bookingService } from '../services/booking.service';
+import { userService } from '../services/user.service';
 import { Room, Booking, User } from '../types';
 
 const revenueData = [
@@ -22,6 +23,7 @@ const AdminDashboardPage: React.FC = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [revenueData, setRevenueData] = useState<{name: string, revenue: number}[]>([]);
 
   // Room Management State
   const [showRoomModal, setShowRoomModal] = useState(false);
@@ -35,7 +37,8 @@ const AdminDashboardPage: React.FC = () => {
 
   // Chat State
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [chatMessages, setChatMessages] = useState<{ id: number, sender: string, text: string, time: Date }[]>([]);
+  const [chatMessages, setChatMessages] = useState<{ id: number, sender: string, text: string, time: Date, senderId?: string }[]>([]);
+  const [activeChatTarget, setActiveChatTarget] = useState<string>('broadcast');
   const [chatInput, setChatInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -48,8 +51,9 @@ const AdminDashboardPage: React.FC = () => {
       const newSocket = io('http://localhost:3000/chat', { query: { role: 'admin' } });
       setSocket(newSocket);
       
-      newSocket.on('userMessage', (data: { message: string, timestamp: string }) => {
-        setChatMessages(prev => [...prev, { id: Date.now(), sender: 'user', text: data.message, time: new Date(data.timestamp) }]);
+      newSocket.on('userMessage', (data: { senderId: string, message: string, timestamp: string }) => {
+        setChatMessages(prev => [...prev, { id: Date.now(), sender: 'user', text: data.message, time: new Date(data.timestamp), senderId: data.senderId }]);
+        if (data.senderId) setActiveChatTarget(data.senderId);
       });
       return () => { newSocket.close(); };
     }
@@ -85,7 +89,7 @@ const AdminDashboardPage: React.FC = () => {
     e.preventDefault();
     if (!chatInput.trim() || !socket) return;
     setChatMessages(prev => [...prev, { id: Date.now(), sender: 'admin', text: chatInput, time: new Date() }]);
-    socket.emit('adminReply', { clientId: 'broadcast', message: chatInput });
+    socket.emit('adminReply', { clientId: activeChatTarget, message: chatInput });
     setChatInput('');
   };
 
