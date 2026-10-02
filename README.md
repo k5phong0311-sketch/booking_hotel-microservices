@@ -1,445 +1,64 @@
-# 🏨 Xây dựng hệ thống đặt phòng khách sạn BookingHotel theo kiến trúc Microservices
+# BOOKINGHOTEL - H\u1ec7 Th\u1ed1ng \u0110\u1eb7t Ph\u00f2ng Kh\u00e1ch S\u1ea1n (Microservices)
 
-Hệ thống đặt phòng khách sạn được xây dựng theo kiến trúc **Microservices**, sử dụng **NestJS (TypeScript)** cho Backend và **React (TypeScript)** cho Frontend.
+![Banner](https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80)
 
-> Dự án được phát triển bởi nhóm 5 thành viên, phục vụ mục đích lab và học tập thực chiến về kiến trúc Microservices.
+\u0110\u00e2y l\u00e0 \u0111\u1ed3 \u00e1n h\u1ec7 th\u1ed1ng \u0111\u1eb7t ph\u00f2ng kh\u00e1ch s\u1ea1n **BOOKINGHOTEL** \u0111\u01b0\u1ee3c x\u00e2y d\u1ef1ng theo ki\u1ebfn tr\u00fac **Microservices** s\u1eed d\u1ee5ng NestJS v\u00e0 React. H\u1ec7 th\u1ed1ng h\u1ed7 tr\u1ee3 \u0111\u1eb7t ph\u00f2ng, thanh to\u00e1n online (MoMo), c\u1ea5p th\u1ebb ph\u00f2ng QR \u0111i\u1ec7n t\u1eed, v\u00e0 Chat CSKH Realtime v\u1edbi admin ho\u1eb7c AI t\u1ef1 \u0111\u1ed9ng.
 
----
+## \u2728 T\u00ednh n\u0103ng n\u1ed5i b\u1eadt
 
-## 🚧 Tiến độ dự án
+1. **Giao di\u1ec7n Kh\u00e1ch h\u00e0ng (Frontend):**
+   - T\u00ecm ki\u1ebfm v\u00e0 xem chi ti\u1ebft ph\u00f2ng tr\u1ef1c quan.
+   - Lu\u1ed3ng \u0111\u1eb7t ph\u00f2ng y\u00eau c\u1ea7u \u0111\u0103ng nh\u1eadp v\u1edbi \u0111\u1ea7y \u0111\u1ee7 th\u00f4ng tin (\u0111\u1ecba ch\u1ec9, SDT, h\u1ecd t\u00ean).
+   - T\u00edch h\u1ee3p nh\u1eadp M\u00e3 khuy\u1ebfn m\u00e3i (Voucher).
+   - C\u1ed5ng thanh to\u00e1n \u0111a d\u1ea1ng (MoMo N\u1ed9i \u0111\u1ecba/Qu\u1ed1c t\u1ebf, Th\u1ebb T\u00edn d\u1ee5ng, Chuy\u1ec3n kho\u1ea3n).
+   - **Th\u1ebb ph\u00f2ng Online (QR Code):** Sau khi \u0111\u1eb7t th\u00e0nh c\u00f4ng, nh\u1eadn ngay th\u1ebb ph\u00f2ng QR \u0111\u1ec3 check-in.
+   - **Live Chat:** T\u01b0\u01a1ng t\u00e1c Realtime v\u1edbi nh\u00e2n vi\u00ean CSKH (\u1ee7ng h\u1ed9 AI Fallback khi nh\u00e2n vi\u00ean b\u1eadn).
 
-> **Ghi chú:** Section này dùng để theo dõi tiến độ trong quá trình phát triển. Sẽ được xóa khi dự án hoàn thiện.
+2. **Giao di\u1ec7n Qu\u1ea3n tr\u1ecb (Admin Dashboard):**
+   - **Overview:** Bi\u1ec3u \u0111\u1ed3 th\u1ed1ng k\u00ea doanh thu th\u1ef1c t\u1ebf l\u1ea5y t\u1eeb l\u1ecbch s\u1eed \u0111\u1eb7t ph\u00f2ng.
+   - **Qu\u1ea3n l\u00fd Users (CRUD):** Xem, x\u00f3a, v\u00e0 ph\u00e2n quy\u1ec1n (Admin/Customer) tr\u1ef1c ti\u1ebfp t\u1eeb b\u1ea3ng \u0111i\u1ec1u khi\u1ec3n.
+   - **Qu\u1ea3n l\u00fd Ph\u00f2ng & \u0110\u1a1n h\u00e0ng:** Ph\u00ea duy\u1ec7t/h\u1ee7y b\u1ecf \u0111\u01a1n \u0111\u1eb7t ph\u00f2ng, \u0111i\u1ec1u ch\u1ec9nh th\u00f4ng tin ph\u00f2ng.
+   - **H\u1ed9p tho\u1ea1i CSKH:** Nh\u1eadn tin nh\u1eafn tr\u1ef1c ti\u1ebfp t\u1eeb User v\u00e0 ph\u1ea3n h\u1ed3i th\u00f4ng qua WebSocket.
 
-| Service | Người phụ trách | Branch | Base Code | CRUD hoàn thiện | Kết nối service | Kiểm thử | Trạng thái |
-|:---|:---|:---|:---:|:---:|:---:|:---:|:---:|
-| **API Gateway & Review** | Trương Văn Phong | `feat/api-gateway` | ✅ | ✅ | ✅ | ⬜ | 🟡 Đang làm |
-| **User & Auth Service** | Trần Đức Hải | `feat/user-auth` | ✅ | ✅ | ✅ | ⬜ | 🟡 Đang làm |
-| **Room Catalog Service** | Nguyễn Thành Hưng | `feat/room-catalog` | ✅ | ✅ | ✅ | ⬜ | 🟡 Đang làm |
-| **Booking Service** | Bùi Đại Dương | `feat/booking-service` | ✅ | ✅ | ✅ | ⬜ | 🟡 Đang làm |
-| **Payment & Notification** | Đậu Ngọc Anh | `feat/payment-notification` | ✅ | ✅ | ✅ | ⬜ | 🟡 Đang làm |
-| **Frontend (React)** | Cả nhóm | `feat/frontend` | ✅ | ✅ | ✅ | ⬜ | 🟡 Đang làm |
+## \ud83d\udee0 C\u00f4ng ngh\u1ec7 s\u1eed d\u1ee5ng
 
-**Chú thích trạng thái:**
-- ✅ Hoàn thành &nbsp;|&nbsp; ⬜ Chưa làm &nbsp;|&nbsp; 🔄 Đang làm
-- 🟢 Hoàn thiện &nbsp;|&nbsp; 🟡 Đang phát triển &nbsp;|&nbsp; ⏳ Chưa bắt đầu &nbsp;|&nbsp; 🔴 Có vấn đề
+- **Frontend:** React, TypeScript, Vite, Tailwind CSS, Recharts.
+- **Backend:** NestJS, TypeScript, TypeORM.
+- **Database:** MySQL (Database-per-service).
+- **Giao ti\u1ebfp:** REST API, WebSocket (Socket.io ch\u1ecbu tr\u00e1ch nhi\u1ec7m Chat Realtime).
+- **Deployment:** Docker & Docker Compose.
 
-### 📅 Milestone (Mốc thời gian dự kiến)
+## \ud83d\udc65 Ph\u00e2n c\u00f4ng c\u00f4ng vi\u1ec7c
 
-| Giai đoạn | Nội dung | Deadline |
-|:---|:---|:---|
-| **Phase 1** | Setup môi trường + Base code tất cả services | ✅ Xong |
-| **Phase 2** | Hoàn thiện CRUD từng service + Kết nối giữa các service | ✅ Xong |
-| **Phase 3** | Xây dựng Frontend React + Tích hợp với API Gateway | ✅ Xong |
-| **Phase 4** | Kiểm thử toàn bộ hệ thống + Fix bug + Viết báo cáo | 🔄 Đang thực hiện |
+| H\u1ecd t\u00ean | Email | Service ph\u1ee5 tr\u00e1ch & Ch\u1ee9c n\u0103ng hi\u1ec7n t\u1ea1i | Branch |
+|:---|:---|:---|:---|
+| **Tr\u01b0\u01a1ng V\u0103n Phong** | k5phong0311@gmail.com | **API Gateway** & **Chat Service**: X\u00e2y d\u1ef1ng c\u1ed5ng API chung. Thi\u1ebft l\u1eadp WebSocket Server t\u1ea1o lu\u1ed3ng tin nh\u1eafn Realtime gi\u1eefa Admin v\u00e0 User, AI t\u1ef1 \u0111\u1ed9ng. | `feat/api-gateway` |
+| **Tr\u1ea7n \u0110\u1ee9c H\u1ea3i** | 2311060742@hunre.edu.vn | **User & Auth Service**: H\u1ec7 th\u1ed1ng x\u00e1c th\u1ef1c JWT, b\u1ea3o m\u1eadt \u0111\u0103ng nh\u1eadp. X\u00e2y d\u1ef1ng API CRUD cho user \u0111\u1ec3 Admin Dashboard g\u1ecdi v\u00e0 thao t\u00e1c (Delete/Update Role). | `feat/user-auth` |
+| **Nguy\u1ec5n Th\u00e0nh H\u01b0ng** | 2311060608@hunre.edu.vn | **Room Catalog Service**: Qu\u1ea3n l\u00fd danh s\u00e1ch ph\u00f2ng, t\u00ecm ki\u1ebfm, x\u1eed l\u00fd tr\u1ea1ng th\u00e1i tr\u1ed1ng. X\u00e2y d\u1ef1ng giao di\u1ec7n hi\u1ec3n th\u1ecb **Th\u1ebb Ph\u00f2ng QR Code** sau khi thanh to\u00e1n. | `feat/room-catalog` |
+| **B\u00f9i \u0110\u1ea1i D\u0169ng** | 2311060706@hunre.edu.vn | **Booking Service**: V\u00f2ng \u0111\u1eddi c\u1ee7a \u0111\u01a1n \u0111\u1eb7t ph\u00f2ng. Ph\u1ee5 tr\u00e1ch ch\u00ednh giao di\u1ec7n **BookingPage**: Th\u00eam tr\u01b0\u1eddng t\u00ean, S\u0110T, v\u00e0 \u00e1p d\u1ee5ng m\u00e3 khuy\u1ebfn m\u00e3i (Voucher). | `feat/booking-service` |
+| **\u0110\u1ea5u Ng\u1ecdc Anh** | daungocanh90@gmail.com | **Payment Service**: T\u00edch h\u1ee3p Payment logic (MoMo mock url). Ch\u1ecbu tr\u00e1ch nhi\u1ec7m thi\u1ebft l\u1eadp Frontend Dashboard (\u0111\u1ed5 d\u1eef li\u1ec7u bi\u1ec3u \u0111\u1ed3 th\u1ef1c v\u00e0 lu\u1ed3ng thanh to\u00e1n \u0111a ph\u01b0\u01a1ng th\u1ee9c). | `feat/payment-notification` |
 
----
+## \ud83d\ude80 C\u00e0i \u0111\u1eb7t & Ch\u1ea1y d\u1ef1 \u00e1n
 
-## 📋 Mục lục
+D\u1ef1 \u00e1n ch\u1ea1y to\u00e0n b\u1ed9 tr\u00ean n\u1ec1n t\u1ea3ng Docker. B\u1ea1n kh\u00f4ng c\u1ea7n c\u00e0i Node.js t\u1eebng d\u1ef1 \u00e1n m\u00e0 ch\u1ec9 c\u1ea7n c\u00f3 **Docker** v\u00e0 **Docker Compose**.
 
-1. [Tech Stack](#-tech-stack)
-2. [Kiến trúc hệ thống](#-kiến-trúc-hệ-thống)
-3. [Danh sách Microservices](#-danh-sách-microservices)
-4. [Luồng nghiệp vụ chính](#-luồng-nghiệp-vụ-chính)
-5. [Cấu trúc thư mục](#-cấu-trúc-thư-mục)
-6. [Cài đặt & Chạy dự án](#-cài-đặt--chạy-dự-án)
-7. [Biến môi trường](#-biến-môi-trường)
-8. [Git Workflow (Quy trình làm việc nhóm)](#-git-workflow)
-9. [API Reference](#-api-reference)
-10. [Quyết định thiết kế](#-quyết-định-thiết-kế)
-
----
-
-## 🛠 Tech Stack
-
-| Layer | Công nghệ | Lý do lựa chọn |
-|:---|:---|:---|
-| **Ngôn ngữ chủ đạo** | TypeScript | Dùng thống nhất cho cả Frontend & Backend |
-| **Frontend** | React + TypeScript (React thuần) | Phổ biến, tài liệu đồ sộ, tách biệt rõ ràng với backend |
-| **Backend** | NestJS + TypeScript | Framework chuẩn hóa theo module, quản lý code chặt chẽ |
-| **Database** | MySQL 8.0 | Quen thuộc, quan hệ rõ ràng, hỗ trợ tốt với TypeORM |
-| **ORM** | TypeORM | Tích hợp sẵn với NestJS, hỗ trợ MySQL |
-| **Auth** | JWT (JSON Web Token) | Stateless, phù hợp Microservices |
-| **Giao tiếp services** | REST API (HTTP) | Đơn giản, dễ debug, phù hợp MVP |
-| **Containerization** | Docker + Docker Compose | Đảm bảo môi trường nhất quán giữa các thành viên |
-| **Version Control** | Git + GitHub | Quản lý code, làm việc nhóm qua Pull Request |
-
----
-
-## 🏗 Kiến trúc hệ thống
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        CLIENT (React)                       │
-└───────────────────────┬─────────────────────────────────────┘
-                        │ HTTP Request
-                        ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   API GATEWAY (Port: 3000)                  │
-│        - Điều hướng request đến đúng service               │
-│        - Xác thực JWT Token                                 │
-│        - Tích hợp Review Service                            │
-└───┬───────────┬───────────┬───────────┬─────────────────────┘
-    │           │           │           │
-    ▼           ▼           ▼           ▼
-┌───────┐ ┌─────────┐ ┌─────────┐ ┌───────────┐
-│ User  │ │  Room   │ │Booking  │ │ Payment & │
-│  &    │ │Catalog  │ │Service  │ │Notification│
-│ Auth  │ │Service  │ │         │ │ Service   │
-│:3001  │ │ :3002   │ │ :3003   │ │  :3004    │
-└───┬───┘ └────┬────┘ └────┬────┘ └─────┬─────┘
-    │          │           │            │
-    ▼          ▼           ▼            ▼
-┌───────┐ ┌─────────┐ ┌─────────┐ ┌───────────┐
-│user_db│ │ room_db │ │booking_ │ │payment_db │
-│(MySQL)│ │ (MySQL) │ │  db     │ │  (MySQL)  │
-└───────┘ └─────────┘ │(MySQL)  │ └───────────┘
-                      └─────────┘
-```
-
-> **Nguyên tắc thiết kế:** Mỗi microservice sở hữu một database riêng biệt (Database-per-service pattern), đảm bảo tính độc lập và tách rời hoàn toàn.
-
----
-
-## 📦 Danh sách Microservices
-
-### 1. 🔀 API Gateway + Review Service — `Port: 3000`
-**Người phụ trách:** _(Truong Van Phong)_
-
-- Nhận toàn bộ request từ Client React
-- Xác thực JWT Token (gọi User Service hoặc tự verify)
-- Điều hướng (proxy) request đến đúng service phía sau
-- Quản lý đánh giá/nhận xét phòng (Review CRUD)
-- **Database:** `gateway_db`
-
----
-
-### 2. 👤 User & Auth Service — `Port: 3001`
-**Người phụ trách:** _(Tran Duc Hai)_
-
-- Đăng ký tài khoản mới (`POST /auth/register`)
-- Đăng nhập và cấp phát JWT Access Token (`POST /auth/login`)
-- Xem & cập nhật thông tin cá nhân (`GET/PATCH /users/:id`)
-- **Database:** `user_db`
-
----
-
-### 3. 🏠 Room Catalog Service — `Port: 3002`
-**Người phụ trách:** _(Nguyen Thanh Hung)_
-
-- Quản lý danh mục phòng (thêm/sửa/xóa phòng)
-- Xem danh sách phòng theo loại, giá, tầng
-- Kiểm tra tình trạng phòng còn trống trong khoảng thời gian nhất định
-- Upload ảnh phòng
-- **Database:** `room_db`
-
----
-
-### 4. 📅 Booking Service — `Port: 3003`
-**Người phụ trách:** _(Bui Dai Duong)_
-
-- Tạo đơn đặt phòng mới (gọi Room Service để kiểm tra phòng trống)
-- Quản lý vòng đời đơn đặt phòng: `PENDING` → `CONFIRMED` / `FAILED` / `CANCELED`
-- Xem lịch sử đặt phòng của người dùng
-- Hủy đặt phòng
-- **Database:** `booking_db`
-
----
-
-### 5. 💳 Payment & Notification Service — `Port: 3004`
-**Người phụ trách:** _(Dau Ngoc Anh)_
-
-- Xử lý thanh toán (giả lập hoặc tích hợp cổng thanh toán)
-- Gọi ngược lại Booking Service để cập nhật trạng thái sau khi thanh toán
-- Gửi email thông báo xác nhận đặt phòng thành công/thất bại
-- **Database:** `payment_db`
-
----
-
-## 🔄 Luồng nghiệp vụ chính
-
-### Luồng Đặt phòng (Booking Flow)
-
-```
-Client
-  │
-  │ POST /api/bookings
-  ▼
-API Gateway
-  │ 1. Verify JWT Token (gọi User Service)
-  │ 2. Forward request
-  ▼
-Booking Service
-  │ 3. Gọi Room Service: GET /rooms/:id/availability
-  ▼
-Room Catalog Service
-  │ 4. Kiểm tra phòng → Trả về kết quả
-  ▼
-Booking Service
-  │ 5. Tạo Booking (Status: PENDING)
-  │ 6. Gọi Payment Service: POST /payments
-  ▼
-Payment & Notification Service
-  │ 7. Xử lý thanh toán
-  │ 8. Gọi Booking Service: PATCH /bookings/:id (Status: CONFIRMED)
-  │ 9. Gửi email xác nhận cho User
-  ▼
-Client nhận phản hồi thành công
-```
-
-### Luồng Đăng nhập (Auth Flow)
-
-```
-Client
-  │ POST /api/auth/login
-  ▼
-API Gateway → User & Auth Service
-  │ Xác thực username/password
-  │ Trả về JWT Access Token
-  ▼
-Client lưu Token → Gắn vào Header các request tiếp theo
-  Authorization: Bearer <token>
-```
-
----
-
-## 📁 Cấu trúc thư mục
-
-```
-booking_hotel-microservices/
-│
-├── api-gateway/               # API Gateway + Review Service
-│   ├── src/
-│   │   ├── app.module.ts
-│   │   ├── main.ts
-│   │   ├── review/
-│   │   │   ├── review.controller.ts
-│   │   │   ├── review.service.ts
-│   │   │   └── review.module.ts
-│   │   └── proxy/             # Điều hướng request
-│   ├── .env.example
-│   └── package.json
-│
-├── user-service/              # User & Auth Service
-│   ├── src/
-│   │   ├── auth/
-│   │   └── users/
-│   ├── .env.example
-│   └── package.json
-│
-├── room-service/              # Room Catalog Service
-│   ├── src/
-│   │   └── rooms/
-│   ├── .env.example
-│   └── package.json
-│
-├── booking-service/           # Booking Service
-│   ├── src/
-│   │   └── bookings/
-│   ├── .env.example
-│   └── package.json
-│
-├── payment-service/           # Payment & Notification Service
-│   ├── src/
-│   │   ├── payments/
-│   │   └── notifications/
-│   ├── .env.example
-│   └── package.json
-│
-├── frontend/                  # React + TypeScript Client
-│   ├── src/
-│   │   ├── pages/
-│   │   ├── components/
-│   │   └── services/          # API calls
-│   └── package.json
-│
-├── docker-compose.yml         # Khởi tạo MySQL
-├── init.sql                   # Script tạo các database
-└── README.md
-```
-
----
-
-## 🚀 Cài đặt & Chạy dự án
-
-### Yêu cầu
-- [Node.js](https://nodejs.org/) >= 18
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [Git](https://git-scm.com/)
-
-### Bước 1: Clone dự án về máy
 ```bash
+# 1. Clone d\u1ef1 \u00e1n
 git clone https://github.com/k5phong0311-sketch/booking_hotel-microservices.git
 cd booking_hotel-microservices
-```
 
-### Bước 2: Khởi động Database bằng Docker
-```bash
-# Chạy lệnh này 1 lần duy nhất (hoặc khi restart máy)
-docker-compose up -d
+# 2. Build v\u00e0 kh\u1edfi ch\u1ea1y c\u00e1c services
+docker-compose up --build -d
 
-# Kiểm tra MySQL đã chạy chưa
+# 3. Ki\u1ec3m tra c\u00e1c container (frontend, 5 nestjs backend, 5 mysql db)
 docker ps
 ```
-> ✅ Lệnh này sẽ tự động tạo 5 database: `user_db`, `room_db`, `booking_db`, `payment_db`, `gateway_db`.
+- **Frontend** ch\u1ea1y t\u1ea1i: `http://localhost:5173`
+- **API Gateway** ch\u1ea1y t\u1ea1i: `http://localhost:3000`
 
-### Bước 3: Cấu hình biến môi trường
-Vào thư mục service bạn phụ trách, copy file `.env.example` thành `.env` và điền thông tin phù hợp.
-```bash
-# Ví dụ cho user-service
-cd user-service
-cp .env.example .env
-```
-
-### Bước 4: Cài dependencies & Chạy service
-```bash
-# Cài thư viện
-npm install
-
-# Chạy ở chế độ development (tự reload khi sửa code)
-npm run start:dev
-```
+## \ud83d\udee1\ufe0f T\u00e0i kho\u1ea3n Test
+- **Admin**: `admin@bookinghotel.com` / `admin123` (Tr\u1ef1c ti\u1ebfp v\u00e0o menu Qu\u1ea3n tr\u1ecb, nh\u1eadn Chat t\u1eeb kh\u00e1ch)
+- **Customer**: `customer@bookinghotel.com` / `123456`
 
 ---
-
-## ⚙️ Biến môi trường
-
-Mỗi service cần một file `.env` với nội dung mẫu như sau:
-
-```env
-# Server
-PORT=3001
-
-# Database (MySQL)
-DB_HOST=localhost
-DB_PORT=3306
-DB_USERNAME=hotel_user
-DB_PASSWORD=hotel_password
-DB_NAME=user_db
-
-# JWT (chỉ dùng cho User & Auth Service và API Gateway)
-JWT_SECRET=your_super_secret_key_here
-JWT_EXPIRES_IN=7d
-```
-
-> ⚠️ **Lưu ý:** Không commit file `.env` lên GitHub. File này đã được thêm vào `.gitignore`.
-
----
-
-## 🌿 Git Workflow
-
-Nhóm sử dụng mô hình **Feature Branch Workflow**.
-
-### Quy tắc đặt tên branch
-```
-feat/<tên-service>
-# Ví dụ:
-feat/user-auth
-feat/room-catalog
-feat/booking-service
-feat/payment-notification
-feat/api-gateway
-```
-
-### Quy trình làm việc hàng ngày
-```bash
-# 1. Cập nhật code mới nhất từ main về máy
-git checkout main
-git pull origin main
-
-# 2. Tạo branch mới cho phần việc của mình
-git checkout -b feat/tên-service
-
-# 3. Code, code, code...
-
-# 4. Lưu thay đổi và đẩy lên GitHub
-git add .
-git commit -m "feat: mô tả ngắn gọn bạn đã làm gì"
-git push origin feat/tên-service
-
-# 5. Vào GitHub → Tạo Pull Request → Nhờ thành viên khác review → Merge vào main
-```
-
-### Quy tắc viết commit message
-| Tiền tố | Ý nghĩa | Ví dụ |
-|:---|:---|:---|
-| `feat:` | Thêm tính năng mới | `feat: add login endpoint` |
-| `fix:` | Sửa lỗi | `fix: handle null token error` |
-| `docs:` | Cập nhật tài liệu | `docs: update readme` |
-| `refactor:` | Cải thiện code, không thêm tính năng | `refactor: clean up booking logic` |
-| `chore:` | Cấu hình, setup | `chore: add docker compose` |
-
----
-
-## 📡 API Reference
-
-Tất cả request đều đi qua `API Gateway` tại `http://localhost:3000`.
-
-> **Header xác thực** (bắt buộc với các route cần đăng nhập):
-> ```
-> Authorization: Bearer <your_jwt_token>
-> ```
-
-### Auth
-| Method | Endpoint | Mô tả | Auth |
-|:---|:---|:---|:---|
-| POST | `/api/auth/register` | Đăng ký tài khoản | ❌ |
-| POST | `/api/auth/login` | Đăng nhập, nhận JWT | ❌ |
-| GET | `/api/users/me` | Xem thông tin cá nhân | ✅ |
-
-### Rooms
-| Method | Endpoint | Mô tả | Auth |
-|:---|:---|:---|:---|
-| GET | `/api/rooms` | Danh sách phòng | ❌ |
-| GET | `/api/rooms/:id` | Chi tiết 1 phòng | ❌ |
-| POST | `/api/rooms` | Thêm phòng mới (Admin) | ✅ |
-| PATCH | `/api/rooms/:id` | Cập nhật phòng (Admin) | ✅ |
-| DELETE | `/api/rooms/:id` | Xóa phòng (Admin) | ✅ |
-
-### Bookings
-| Method | Endpoint | Mô tả | Auth |
-|:---|:---|:---|:---|
-| POST | `/api/bookings` | Tạo đơn đặt phòng | ✅ |
-| GET | `/api/bookings/my` | Lịch sử đặt phòng của tôi | ✅ |
-| GET | `/api/bookings/:id` | Chi tiết đơn đặt phòng | ✅ |
-| PATCH | `/api/bookings/:id/cancel` | Hủy đơn | ✅ |
-
-### Payments
-| Method | Endpoint | Mô tả | Auth |
-|:---|:---|:---|:---|
-| POST | `/api/payments` | Khởi tạo thanh toán | ✅ |
-| GET | `/api/payments/:bookingId` | Xem trạng thái thanh toán | ✅ |
-
-### Reviews
-| Method | Endpoint | Mô tả | Auth |
-|:---|:---|:---|:---|
-| POST | `/api/reviews` | Viết đánh giá | ✅ |
-| GET | `/api/reviews/room/:roomId` | Đánh giá của 1 phòng | ❌ |
-
----
-
-## 📐 Quyết định thiết kế
-
-| # | Quyết định | Lựa chọn | Lý do |
-|:---|:---|:---|:---|
-| 1 | Giao tiếp giữa services | **REST API đồng bộ** | Dễ hiểu, dễ debug cho nhóm mới học Microservices. Message Broker (Kafka/RabbitMQ) bị loại vì chưa được học. |
-| 2 | Database | **MySQL (Database-per-service)** | Quen thuộc, dễ dùng với TypeORM. Mỗi service có DB riêng để đảm bảo tính độc lập. |
-| 3 | Authentication | **JWT Stateless** | Không cần lưu session trên server, phù hợp hoàn toàn với kiến trúc microservices. |
-| 4 | Backend Framework | **NestJS** | Chuẩn hóa theo module, tích hợp sẵn Dependency Injection, TypeORM, HTTP Module. |
-| 5 | Frontend Framework | **React thuần (không Next.js)** | Tách biệt rõ ràng Frontend/Backend, tránh kiến trúc phức tạp không cần thiết. |
-| 6 | Xử lý lỗi (MVP) | **Compensating Transaction đơn giản** | Nếu Payment lỗi, Booking tự chuyển sang FAILED. Không dùng Saga pattern để tránh over-engineering. |
-
----
-
-## 👥 Thành viên nhóm
-
-| Họ tên | Email | Service phụ trách | Branch |
-|:---|:---|:---|:---|
-| Trương Văn Phong | k5phong0311@gmail.com | API Gateway & Review Service | `feat/api-gateway` |
-| Trần Đức Hải | 2311060742@hunre.edu.vn | User & Auth Service | `feat/user-auth` |
-| Nguyễn Thành Hưng | 2311060608@hunre.edu.vn | Room Catalog Service | `feat/room-catalog` |
-| Bùi Đại Dương | 2311060706@hunre.edu.vn | Booking Service | `feat/booking-service` |
-| Đậu Ngọc Anh | daungocanh90@gmail.com | Payment & Notification Service | `feat/payment-notification` |
-
----
-
-<p align="center">Made with ❤️ by Group 10 </p>
+*D\u1ef1 \u00e1n thi\u1ebft k\u1ebf t\u1eeb thi\u1ebft th\u1ef1c t\u1ebf, h\u01b0\u1edbng \u0111\u1ebfn m\u1ed9t ki\u1ebfn tr\u00fac h\u1ec7 th\u1ed1ng m\u1edf r\u1ed9ng cho ng\u00e0nh ngh\u1ec9 d\u01b0\u1ee1ng v\u00e0 du l\u1ecbch.*
