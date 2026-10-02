@@ -1,46 +1,59 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { io, Socket } from 'socket.io-client';
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
-} from 'recharts';
-import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
+import { roomService } from '../services/room.service';
+import { bookingService } from '../services/booking.service';
+import { Room, Booking, User } from '../types';
+
+const revenueData = [
+  { name: 'Mon', revenue: 4000000 },
+  { name: 'Tue', revenue: 3000000 },
+  { name: 'Wed', revenue: 5000000 },
+  { name: 'Thu', revenue: 2780000 },
+  { name: 'Fri', revenue: 8900000 },
+  { name: 'Sat', revenue: 12000000 },
+  { name: 'Sun', revenue: 9500000 },
+];
 
 const AdminDashboardPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'rooms' | 'users' | 'chat'>('dashboard');
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState<'overview' | 'rooms' | 'bookings' | 'users' | 'chat'>('overview');
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+
+  // Room Management State
+  const [showRoomModal, setShowRoomModal] = useState(false);
+  const [editingRoom, setEditingRoom] = useState<Partial<Room>>({});
   
+  // Voucher state
   const [voucherCode, setVoucherCode] = useState('');
   const [voucherValue, setVoucherValue] = useState(0);
-  const [quantity, setQuantity] = useState(50);
+  const [quantity, setQuantity] = useState(0);
   const [statusMsg, setStatusMsg] = useState('');
 
-  const [rooms, setRooms] = useState<any[]>([]);
-  const [users, setUsers] = useState<any[]>([]);
-  const [bookings, setBookings] = useState<any[]>([]);
-  const [revenueData, setRevenueData] = useState<any[]>([]);
-  const [totalRevenue, setTotalRevenue] = useState(0);
-
+  // Chat State
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [chatMessages, setChatMessages] = useState<any[]>([]);
+  const [chatMessages, setChatMessages] = useState<{ id: number, sender: string, text: string, time: Date }[]>([]);
   const [chatInput, setChatInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const widget = document.getElementById('customer-chat-widget');
-    if (widget) widget.style.display = 'none';
-
     fetchData();
-
-    const newSocket = io('http://localhost:3000/chat', { query: { role: 'admin' } });
-    newSocket.on('userMessage', (data) => {
-      setChatMessages(prev => [...prev, { id: Date.now(), sender: 'user', text: data.message, time: new Date(data.timestamp) }]);
-    });
-    setSocket(newSocket);
-
-    return () => {
-      if (widget) widget.style.display = 'block';
-      newSocket.disconnect();
-    };
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'chat' && !socket) {
+      const newSocket = io('http://localhost:3000/chat', { query: { role: 'admin' } });
+      setSocket(newSocket);
+      
+      newSocket.on('userMessage', (data: { message: string, timestamp: string }) => {
+        setChatMessages(prev => [...prev, { id: Date.now(), sender: 'user', text: data.message, time: new Date(data.timestamp) }]);
+      });
+      return () => { newSocket.close(); };
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -48,30 +61,15 @@ const AdminDashboardPage: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      const [roomsRes, usersRes, bookingsRes] = await Promise.all([
-        api.get('/rooms').catch(() => ({ data: [] })),
-        api.get('/users').catch(() => ({ data: [] })),
-        api.get('/bookings').catch(() => ({ data: [] }))
-      ]);
+      const roomsData = await roomService.getAll();
+      setRooms(roomsData);
       
-      setRooms(roomsRes.data);
-      setUsers(usersRes.data);
-      
-      const bks = bookingsRes.data || [];
-      setBookings(bks);
+      const bookingsData = await bookingService.getAllBookings();
+      setBookings(bookingsData);
 
-      let rev = 0;
-      bks.forEach((b: any) => { if (b.status !== 'CANCELLED') rev += Number(b.totalPrice); });
-      setTotalRevenue(rev);
-
-      setRevenueData([
-        { name: 'Mon', revenue: rev * 0.1, bookings: bks.length },
-        { name: 'Tue', revenue: rev * 0.15, bookings: bks.length + 1 },
-        { name: 'Wed', revenue: rev * 0.2, bookings: bks.length + 2 },
-        { name: 'Thu', revenue: rev * 0.1, bookings: bks.length },
-        { name: 'Fri', revenue: rev * 0.25, bookings: bks.length + 3 },
-        { name: 'Sat', revenue: rev * 0.15, bookings: bks.length + 4 },
-        { name: 'Sun', revenue: rev * 0.05, bookings: bks.length + 1 },
+      setUsers([
+        { id: 1, email: 'admin@bookinghotel.com', role: 'ADMIN', fullName: 'Trường Văn Phong', createdAt: new Date().toISOString() },
+        { id: 2, email: 'customer@test.com', role: 'CUSTOMER', fullName: 'Nguyễn Văn Khách', createdAt: new Date().toISOString() }
       ]);
     } catch (err) {
       console.error(err);
@@ -80,11 +78,7 @@ const AdminDashboardPage: React.FC = () => {
 
   const handleBroadcastVoucher = (e: React.FormEvent) => {
     e.preventDefault();
-    setStatusMsg('Đang phát hành Voucher...');
-    setTimeout(() => {
-      setStatusMsg(`Đã phát hành thành công ${quantity} mã ${voucherCode} (-${voucherValue}%)!`);
-      setVoucherCode('');
-    }, 1000);
+    setStatusMsg(`__ISSUED_VOUCHER__ ${voucherCode} (-${voucherValue}%). __QUANTITY__: ${quantity}`);
   };
 
   const handleSendReply = (e: React.FormEvent) => {
@@ -95,29 +89,51 @@ const AdminDashboardPage: React.FC = () => {
     setChatInput('');
   };
 
+  const handleSaveRoom = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (editingRoom.id) {
+        // update placeholder
+      } else {
+        await roomService.createRoom(editingRoom);
+      }
+      setShowRoomModal(false);
+      setEditingRoom({});
+      fetchData();
+    } catch (err) {
+      alert('__ERROR__');
+    }
+  };
+
+  const handleDeleteRoom = async (id: number) => {
+    if (confirm('__CONFIRM_DELETE__')) {
+      await roomService.deleteRoom(id);
+      fetchData();
+    }
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
-      <div className="mb-8 border-b border-gray-200 pb-5 flex justify-between items-end">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Trang Quản Trị</h1>
-          <div className="flex gap-4 mt-4">
-            <button onClick={() => setActiveTab('dashboard')} className={`px-4 py-2 font-bold rounded-lg ${activeTab === 'dashboard' ? 'bg-brand-DEFAULT text-white' : 'bg-gray-100 text-gray-600'}`}>Thống kê</button>
-            <button onClick={() => setActiveTab('rooms')} className={`px-4 py-2 font-bold rounded-lg ${activeTab === 'rooms' ? 'bg-brand-DEFAULT text-white' : 'bg-gray-100 text-gray-600'}`}>Quản lý Phòng</button>
-            <button onClick={() => setActiveTab('users')} className={`px-4 py-2 font-bold rounded-lg ${activeTab === 'users' ? 'bg-brand-DEFAULT text-white' : 'bg-gray-100 text-gray-600'}`}>Quản lý User</button>
-            <button onClick={() => setActiveTab('chat')} className={`px-4 py-2 font-bold rounded-lg flex items-center gap-2 ${activeTab === 'chat' ? 'bg-brand-DEFAULT text-white' : 'bg-gray-100 text-gray-600'}`}>Hỗ trợ Khách hàng</button>
-          </div>
-        </div>
-        <div className="text-right">
-          <p className="text-sm text-gray-500">Tổng doanh thu</p>
-          <p className="text-3xl font-bold text-brand-DEFAULT">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalRevenue)}</p>
+          <h1 className="text-3xl font-serif font-bold text-gray-900 mb-2">__DASHBOARD_TITLE__</h1>
+          <p className="text-gray-500">__DASHBOARD_SUBTITLE__</p>
         </div>
       </div>
 
-      {activeTab === 'dashboard' && (
+      <div className="flex space-x-2 mb-8 bg-white p-2 rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
+        <button onClick={() => setActiveTab('overview')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'overview' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>__TAB_OVERVIEW__</button>
+        <button onClick={() => setActiveTab('rooms')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'rooms' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>__TAB_ROOMS__</button>
+        <button onClick={() => setActiveTab('bookings')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'bookings' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>__TAB_BOOKINGS__</button>
+        <button onClick={() => setActiveTab('users')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'users' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>__TAB_USERS__</button>
+        <button onClick={() => setActiveTab('chat')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'chat' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>__TAB_CHAT__</button>
+      </div>
+
+      {activeTab === 'overview' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900 mb-6">Doanh thu dự kiến</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-6">__REVENUE__</h3>
               <div className="h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={revenueData}>
@@ -133,23 +149,23 @@ const AdminDashboardPage: React.FC = () => {
           </div>
           <div className="lg:col-span-1">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-brand-DEFAULT/20 bg-brand-light/30">
-              <h3 className="text-xl font-bold text-brand-dark mb-2">Chiến dịch Marketing</h3>
+              <h3 className="text-xl font-bold text-brand-dark mb-2">__MARKETING__</h3>
               <form onSubmit={handleBroadcastVoucher} className="space-y-5">
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Mã Voucher</label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">__VOUCHER_CODE__</label>
                   <input type="text" required value={voucherCode} onChange={e => setVoucherCode(e.target.value.toUpperCase())} className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none uppercase font-bold" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">Giảm (%)</label>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">__DISCOUNT__</label>
                     <input type="number" required value={voucherValue} onChange={e => setVoucherValue(Number(e.target.value))} className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none" />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">Số lượng</label>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">__QTY__</label>
                     <input type="number" required value={quantity} onChange={e => setQuantity(Number(e.target.value))} className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none" />
                   </div>
                 </div>
-                <button type="submit" className="w-full py-3 bg-brand-dark text-white rounded-lg font-bold mt-4">PHÁT HÀNH VOUCHER</button>
+                <button type="submit" className="w-full py-3 bg-brand-dark text-white rounded-lg font-bold mt-4">__ISSUE_VOUCHER__</button>
               </form>
               {statusMsg && <div className="mt-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm">{statusMsg}</div>}
             </div>
@@ -158,15 +174,20 @@ const AdminDashboardPage: React.FC = () => {
       )}
 
       {activeTab === 'rooms' && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-gray-900">__ROOM_LIST__</h2>
+            <button onClick={() => { setEditingRoom({}); setShowRoomModal(true); }} className="bg-brand-DEFAULT text-white px-4 py-2 rounded-lg font-bold text-sm">+ __ADD_ROOM__</button>
+          </div>
           <table className="w-full text-left">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 font-bold text-gray-900">Hình ảnh</th>
-                <th className="px-6 py-4 font-bold text-gray-900">Tên phòng</th>
-                <th className="px-6 py-4 font-bold text-gray-900">Loại</th>
-                <th className="px-6 py-4 font-bold text-gray-900">Giá / Đêm</th>
-                <th className="px-6 py-4 font-bold text-gray-900">Trạng thái</th>
+                <th className="px-6 py-4 font-bold text-gray-900">__IMAGE__</th>
+                <th className="px-6 py-4 font-bold text-gray-900">__ROOM_NAME__</th>
+                <th className="px-6 py-4 font-bold text-gray-900">__TYPE__</th>
+                <th className="px-6 py-4 font-bold text-gray-900">__PRICE__</th>
+                <th className="px-6 py-4 font-bold text-gray-900">__STATUS__</th>
+                <th className="px-6 py-4 font-bold text-gray-900">__ACTIONS__</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -178,7 +199,97 @@ const AdminDashboardPage: React.FC = () => {
                   <td className="px-6 py-4 text-brand-DEFAULT font-bold">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(room.pricePerNight)}</td>
                   <td className="px-6 py-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold ${room.isAvailable ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                      {room.isAvailable ? 'Trống' : 'Đã đặt'}
+                      {room.isAvailable ? '__AVAILABLE__' : '__BOOKED__'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 flex space-x-2">
+                    <button className="text-blue-600 font-bold text-sm">__EDIT__</button>
+                    <button onClick={() => handleDeleteRoom(room.id)} className="text-red-600 font-bold text-sm">__DELETE__</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {showRoomModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-8">
+            <h2 className="text-2xl font-bold mb-6">{editingRoom.id ? '__UPDATE_ROOM__' : '__ADD_ROOM__'}</h2>
+            <form onSubmit={handleSaveRoom} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold mb-1">__ROOM_NAME__</label>
+                  <input type="text" required className="w-full border p-2 rounded-lg" value={editingRoom.name || ''} onChange={e => setEditingRoom({...editingRoom, name: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-1">__TYPE__</label>
+                  <select required className="w-full border p-2 rounded-lg" value={editingRoom.type || 'SINGLE'} onChange={e => setEditingRoom({...editingRoom, type: e.target.value as any})}>
+                    <option value="SINGLE">Single</option>
+                    <option value="DOUBLE">Double</option>
+                    <option value="DELUXE">Deluxe</option>
+                    <option value="SUITE">Suite</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-1">__PRICE_PER_NIGHT__</label>
+                  <input type="number" required className="w-full border p-2 rounded-lg" value={editingRoom.pricePerNight || ''} onChange={e => setEditingRoom({...editingRoom, pricePerNight: Number(e.target.value)})} />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-1">__FLOOR__</label>
+                  <input type="number" required className="w-full border p-2 rounded-lg" value={editingRoom.floor || 1} onChange={e => setEditingRoom({...editingRoom, floor: Number(e.target.value)})} />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-bold mb-1">__IMAGE_URL__</label>
+                  <input type="text" required className="w-full border p-2 rounded-lg" value={editingRoom.imageUrl || ''} onChange={e => setEditingRoom({...editingRoom, imageUrl: e.target.value})} />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-bold mb-1">__DESC__</label>
+                  <textarea rows={3} required className="w-full border p-2 rounded-lg" value={editingRoom.description || ''} onChange={e => setEditingRoom({...editingRoom, description: e.target.value})}></textarea>
+                </div>
+                <div className="col-span-2">
+                  <label className="flex items-center space-x-2">
+                    <input type="checkbox" checked={editingRoom.isAvailable !== false} onChange={e => setEditingRoom({...editingRoom, isAvailable: e.target.checked})} />
+                    <span className="font-bold text-sm">__IS_AVAILABLE__</span>
+                  </label>
+                </div>
+              </div>
+              <div className="flex justify-end space-x-3 mt-8">
+                <button type="button" onClick={() => setShowRoomModal(false)} className="px-6 py-2 bg-gray-100 text-gray-700 font-bold rounded-lg">__CANCEL__</button>
+                <button type="submit" className="px-6 py-2 bg-brand-dark text-white font-bold rounded-lg">__SAVE__</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'bookings' && (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <table className="w-full text-left">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-4 font-bold text-gray-900">ID</th>
+                <th className="px-6 py-4 font-bold text-gray-900">__BOOKER_ID__</th>
+                <th className="px-6 py-4 font-bold text-gray-900">__ROOM_ID__</th>
+                <th className="px-6 py-4 font-bold text-gray-900">__DATES__</th>
+                <th className="px-6 py-4 font-bold text-gray-900">__TOTAL_PRICE__</th>
+                <th className="px-6 py-4 font-bold text-gray-900">__STATUS__</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {bookings.map(b => (
+                <tr key={b.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-gray-500">#{b.id}</td>
+                  <td className="px-6 py-4 font-bold text-gray-900">{b.userId}</td>
+                  <td className="px-6 py-4">Room {b.roomId}</td>
+                  <td className="px-6 py-4 text-sm">
+                    {new Date(b.checkIn).toLocaleDateString('vi-VN')} - {new Date(b.checkOut).toLocaleDateString('vi-VN')}
+                  </td>
+                  <td className="px-6 py-4 text-brand-DEFAULT font-bold">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(b.totalPrice)}</td>
+                  <td className="px-6 py-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${b.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' : b.status === 'CANCELED' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                      {b.status}
                     </span>
                   </td>
                 </tr>
@@ -194,16 +305,16 @@ const AdminDashboardPage: React.FC = () => {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-4 font-bold text-gray-900">ID</th>
-                <th className="px-6 py-4 font-bold text-gray-900">Tên người dùng</th>
+                <th className="px-6 py-4 font-bold text-gray-900">__USERNAME__</th>
                 <th className="px-6 py-4 font-bold text-gray-900">Email</th>
-                <th className="px-6 py-4 font-bold text-gray-900">Quyền (Role)</th>
+                <th className="px-6 py-4 font-bold text-gray-900">__ROLE__</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {users.map(u => (
                 <tr key={u.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-gray-500">#{u.id}</td>
-                  <td className="px-6 py-4 font-bold text-gray-900">{u.fullName || u.name}</td>
+                  <td className="px-6 py-4 font-bold text-gray-900">{u.fullName}</td>
                   <td className="px-6 py-4">{u.email}</td>
                   <td className="px-6 py-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold ${u.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
@@ -220,17 +331,17 @@ const AdminDashboardPage: React.FC = () => {
       {activeTab === 'chat' && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 flex h-[600px] overflow-hidden">
           <div className="w-1/3 border-r border-gray-100 p-4 bg-gray-50">
-            <h3 className="font-bold text-gray-900 mb-4">Khách hàng</h3>
+            <h3 className="font-bold text-gray-900 mb-4">__CUSTOMERS__</h3>
             <div className="p-3 bg-white rounded-lg shadow-sm border-l-4 border-brand-DEFAULT cursor-pointer">
-              <p className="font-bold text-sm">Tất cả tin nhắn</p>
-              <p className="text-xs text-gray-500 mt-1">Cổng chat hỗ trợ chung</p>
+              <p className="font-bold text-sm">__ALL_MESSAGES__</p>
+              <p className="text-xs text-gray-500 mt-1">__GENERAL_SUPPORT__</p>
             </div>
           </div>
           <div className="flex-1 flex flex-col">
             <div className="flex-1 p-4 overflow-y-auto bg-gray-50 flex flex-col gap-4">
               {chatMessages.map(msg => (
                 <div key={msg.id} className={`flex flex-col max-w-[70%] ${msg.sender === 'admin' ? 'self-end items-end' : 'self-start items-start'}`}>
-                  <span className="text-[10px] text-gray-400 mb-1">{msg.sender === 'admin' ? 'Admin' : 'Khách hàng'}</span>
+                  <span className="text-[10px] text-gray-400 mb-1">{msg.sender === 'admin' ? 'Admin' : '__CUSTOMER__'}</span>
                   <div className={`px-4 py-2 rounded-xl text-sm ${msg.sender === 'admin' ? 'bg-brand-DEFAULT text-white rounded-tr-none' : 'bg-white text-gray-900 border border-gray-200 rounded-tl-none'}`}>
                     {msg.text}
                   </div>
@@ -239,8 +350,8 @@ const AdminDashboardPage: React.FC = () => {
               <div ref={messagesEndRef} />
             </div>
             <form onSubmit={handleSendReply} className="p-4 bg-white border-t border-gray-100 flex gap-2">
-              <input type="text" value={chatInput} onChange={e => setChatInput(e.target.value)} placeholder="Loại a reply..." className="flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none" />
-              <button type="submit" className="px-6 py-2 bg-brand-dark text-white font-bold rounded-lg">Gửi</button>
+              <input type="text" value={chatInput} onChange={e => setChatInput(e.target.value)} placeholder="__TYPE_MESSAGE__" className="flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none" />
+              <button type="submit" className="px-6 py-2 bg-brand-dark text-white font-bold rounded-lg">__SEND__</button>
             </form>
           </div>
         </div>
