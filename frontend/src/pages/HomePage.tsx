@@ -31,7 +31,7 @@ const HomePage: React.FC = () => {
     <div className="bg-gray-50 min-h-screen pb-20">
       {/* Hero Section */}
       <section className="relative pt-24 pb-32 overflow-hidden flex flex-col items-center justify-center min-h-[85vh]">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1542314831-c6a4d1424869?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center bg-no-repeat opacity-40"></div>
+        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1542314831-c6a4d1424869?q=80&w=2000&auto=format&fit=crop')" }}></div>
         <div className="absolute inset-0 bg-gradient-to-b from-white/90 via-white/70 to-gray-50"></div>
         <div className="absolute inset-0 bg-brand-light/10"></div>
         

@@ -1,16 +1,14 @@
 const mysql = require('mysql2/promise');
 
 const images = [
-  'https://images.unsplash.com/photo-1598928506311-c55dd61df898?q=80&w=1000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1590490359683-658d34c8f178?q=80&w=1000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=1000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=1000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1000&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1000&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=1000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1618773928120-2c15c328080f?q=80&w=1000&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=1000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1591088398332-8a7791972843?q=80&w=1000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1000&auto=format&fit=crop'
+  'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1000&auto=format&fit=crop'
 ];
 
 const types = ['SINGLE', 'DOUBLE', 'SUITE', 'DELUXE'];
@@ -53,7 +51,7 @@ const generateRoom = (id) => {
 
 async function seedRooms() {
   const connection = await mysql.createConnection({
-    host: 'booking_mysql',
+    host: 'hotel_booking_mysql',
     user: 'root',
     password: 'rootpassword',
     database: 'room_db'

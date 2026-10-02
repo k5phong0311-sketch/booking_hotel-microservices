@@ -137,24 +137,24 @@ const AdminDashboardPage: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-serif font-bold text-gray-900 mb-2">__DASHBOARD_TITLE__</h1>
-          <p className="text-gray-500">__DASHBOARD_SUBTITLE__</p>
+          <h1 className="text-3xl font-serif font-bold text-gray-900 mb-2">Bảng Điều Khiển Quản Trị</h1>
+          <p className="text-gray-500">Quản lý phòng, đơn đặt, người dùng và hỗ trợ khách hàng.</p>
         </div>
       </div>
 
       <div className="flex space-x-2 mb-8 bg-white p-2 rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
-        <button onClick={() => setActiveTab('overview')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'overview' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>__TAB_OVERVIEW__</button>
-        <button onClick={() => setActiveTab('rooms')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'rooms' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>__TAB_ROOMS__</button>
-        <button onClick={() => setActiveTab('bookings')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'bookings' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>__TAB_BOOKINGS__</button>
-        <button onClick={() => setActiveTab('users')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'users' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>__TAB_USERS__</button>
-        <button onClick={() => setActiveTab('chat')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'chat' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>__TAB_CHAT__</button>
+        <button onClick={() => setActiveTab('overview')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'overview' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>Tổng quan</button>
+        <button onClick={() => setActiveTab('rooms')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'rooms' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>Phòng</button>
+        <button onClick={() => setActiveTab('bookings')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'bookings' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>Đơn đặt</button>
+        <button onClick={() => setActiveTab('users')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'users' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>Người dùng</button>
+        <button onClick={() => setActiveTab('chat')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'chat' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>Hỗ trợ (Chat)</button>
       </div>
 
       {activeTab === 'overview' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900 mb-6">__REVENUE__</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-6">Doanh thu 7 ngày</h3>
               <div className="h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={revenueData}>
@@ -170,23 +170,23 @@ const AdminDashboardPage: React.FC = () => {
           </div>
           <div className="lg:col-span-1">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-brand-DEFAULT/20 bg-brand-light/30">
-              <h3 className="text-xl font-bold text-brand-dark mb-2">__MARKETING__</h3>
+              <h3 className="text-xl font-bold text-brand-dark mb-2">Chiến dịch Marketing</h3>
               <form onSubmit={handleBroadcastVoucher} className="space-y-5">
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">__VOUCHER_CODE__</label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Mã giảm giá</label>
                   <input type="text" required value={voucherCode} onChange={e => setVoucherCode(e.target.value.toUpperCase())} className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none uppercase font-bold" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">__DISCOUNT__</label>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Giảm giá (%)</label>
                     <input type="number" required value={voucherValue} onChange={e => setVoucherValue(Number(e.target.value))} className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none" />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">__QTY__</label>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Số lượng</label>
                     <input type="number" required value={quantity} onChange={e => setQuantity(Number(e.target.value))} className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none" />
                   </div>
                 </div>
-                <button type="submit" className="w-full py-3 bg-brand-dark text-white rounded-lg font-bold mt-4">__ISSUE_VOUCHER__</button>
+                <button type="submit" className="w-full py-3 bg-brand-dark text-white rounded-lg font-bold mt-4">Phát hành</button>
               </form>
               {statusMsg && <div className="mt-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm">{statusMsg}</div>}
             </div>
@@ -204,10 +204,10 @@ const AdminDashboardPage: React.FC = () => {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-4 font-bold text-gray-900">__IMAGE__</th>
-                <th className="px-6 py-4 font-bold text-gray-900">__ROOM_NAME__</th>
-                <th className="px-6 py-4 font-bold text-gray-900">__TYPE__</th>
-                <th className="px-6 py-4 font-bold text-gray-900">__PRICE__</th>
-                <th className="px-6 py-4 font-bold text-gray-900">__STATUS__</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Tên phòng</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Loại</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Giá/Ngày</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Trạng thái</th>
                 <th className="px-6 py-4 font-bold text-gray-900">__ACTIONS__</th>
               </tr>
             </thead>
@@ -224,8 +224,8 @@ const AdminDashboardPage: React.FC = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 flex space-x-2">
-                    <button className="text-blue-600 font-bold text-sm">__EDIT__</button>
-                    <button onClick={() => handleDeleteRoom(room.id)} className="text-red-600 font-bold text-sm">__DELETE__</button>
+                    <button className="text-blue-600 font-bold text-sm">Sửa</button>
+                    <button onClick={() => handleDeleteRoom(room.id)} className="text-red-600 font-bold text-sm">Xóa</button>
                   </td>
                 </tr>
               ))}
@@ -241,11 +241,11 @@ const AdminDashboardPage: React.FC = () => {
             <form onSubmit={handleSaveRoom} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-bold mb-1">__ROOM_NAME__</label>
+                  <label className="block text-sm font-bold mb-1">Tên phòng</label>
                   <input type="text" required className="w-full border p-2 rounded-lg" value={editingRoom.name || ''} onChange={e => setEditingRoom({...editingRoom, name: e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold mb-1">__TYPE__</label>
+                  <label className="block text-sm font-bold mb-1">Loại</label>
                   <select required className="w-full border p-2 rounded-lg" value={editingRoom.type || 'SINGLE'} onChange={e => setEditingRoom({...editingRoom, type: e.target.value as any})}>
                     <option value="SINGLE">Single</option>
                     <option value="DOUBLE">Double</option>
@@ -258,27 +258,27 @@ const AdminDashboardPage: React.FC = () => {
                   <input type="number" required className="w-full border p-2 rounded-lg" value={editingRoom.pricePerNight || ''} onChange={e => setEditingRoom({...editingRoom, pricePerNight: Number(e.target.value)})} />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold mb-1">__FLOOR__</label>
+                  <label className="block text-sm font-bold mb-1">Tầng</label>
                   <input type="number" required className="w-full border p-2 rounded-lg" value={editingRoom.floor || 1} onChange={e => setEditingRoom({...editingRoom, floor: Number(e.target.value)})} />
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-bold mb-1">__IMAGE_URL__</label>
+                  <label className="block text-sm font-bold mb-1">Link Ảnh</label>
                   <input type="text" required className="w-full border p-2 rounded-lg" value={editingRoom.imageUrl || ''} onChange={e => setEditingRoom({...editingRoom, imageUrl: e.target.value})} />
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-bold mb-1">__DESC__</label>
+                  <label className="block text-sm font-bold mb-1">Mô tả</label>
                   <textarea rows={3} required className="w-full border p-2 rounded-lg" value={editingRoom.description || ''} onChange={e => setEditingRoom({...editingRoom, description: e.target.value})}></textarea>
                 </div>
                 <div className="col-span-2">
                   <label className="flex items-center space-x-2">
                     <input type="checkbox" checked={editingRoom.isAvailable !== false} onChange={e => setEditingRoom({...editingRoom, isAvailable: e.target.checked})} />
-                    <span className="font-bold text-sm">__IS_AVAILABLE__</span>
+                    <span className="font-bold text-sm">Còn trống</span>
                   </label>
                 </div>
               </div>
               <div className="flex justify-end space-x-3 mt-8">
-                <button type="button" onClick={() => setShowRoomModal(false)} className="px-6 py-2 bg-gray-100 text-gray-700 font-bold rounded-lg">__CANCEL__</button>
-                <button type="submit" className="px-6 py-2 bg-brand-dark text-white font-bold rounded-lg">__SAVE__</button>
+                <button type="button" onClick={() => setShowRoomModal(false)} className="px-6 py-2 bg-gray-100 text-gray-700 font-bold rounded-lg">Hủy</button>
+                <button type="submit" className="px-6 py-2 bg-brand-dark text-white font-bold rounded-lg">Lưu phòng</button>
               </div>
             </form>
           </div>
@@ -291,11 +291,11 @@ const AdminDashboardPage: React.FC = () => {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-4 font-bold text-gray-900">ID</th>
-                <th className="px-6 py-4 font-bold text-gray-900">__BOOKER_ID__</th>
-                <th className="px-6 py-4 font-bold text-gray-900">__ROOM_ID__</th>
-                <th className="px-6 py-4 font-bold text-gray-900">__DATES__</th>
-                <th className="px-6 py-4 font-bold text-gray-900">__TOTAL_PRICE__</th>
-                <th className="px-6 py-4 font-bold text-gray-900">__STATUS__</th>
+                <th className="px-6 py-4 font-bold text-gray-900">ID Khách</th>
+                <th className="px-6 py-4 font-bold text-gray-900">ID Phòng</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Ngày đặt</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Tổng tiền</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Trạng thái</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -335,9 +335,9 @@ const AdminDashboardPage: React.FC = () => {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-4 font-bold text-gray-900">ID</th>
-                <th className="px-6 py-4 font-bold text-gray-900">__USERNAME__</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Tên người dùng</th>
                 <th className="px-6 py-4 font-bold text-gray-900">Email</th>
-                <th className="px-6 py-4 font-bold text-gray-900">__ROLE__</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Vai trò</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -362,17 +362,17 @@ const AdminDashboardPage: React.FC = () => {
       {activeTab === 'chat' && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 flex h-[600px] overflow-hidden">
           <div className="w-1/3 border-r border-gray-100 p-4 bg-gray-50">
-            <h3 className="font-bold text-gray-900 mb-4">__CUSTOMERS__</h3>
+            <h3 className="font-bold text-gray-900 mb-4">Khách hàng</h3>
             <div className="p-3 bg-white rounded-lg shadow-sm border-l-4 border-brand-DEFAULT cursor-pointer">
-              <p className="font-bold text-sm">__ALL_MESSAGES__</p>
-              <p className="text-xs text-gray-500 mt-1">__GENERAL_SUPPORT__</p>
+              <p className="font-bold text-sm">Tất cả tin nhắn</p>
+              <p className="text-xs text-gray-500 mt-1">Hỗ trợ chung</p>
             </div>
           </div>
           <div className="flex-1 flex flex-col">
             <div className="flex-1 p-4 overflow-y-auto bg-gray-50 flex flex-col gap-4">
               {chatMessages.map(msg => (
                 <div key={msg.id} className={`flex flex-col max-w-[70%] ${msg.sender === 'admin' ? 'self-end items-end' : 'self-start items-start'}`}>
-                  <span className="text-[10px] text-gray-400 mb-1">{msg.sender === 'admin' ? 'Admin' : '__CUSTOMER__'}</span>
+                  <span className="text-[10px] text-gray-400 mb-1">{msg.sender === 'admin' ? 'Admin' : 'Khách'}</span>
                   <div className={`px-4 py-2 rounded-xl text-sm ${msg.sender === 'admin' ? 'bg-brand-DEFAULT text-white rounded-tr-none' : 'bg-white text-gray-900 border border-gray-200 rounded-tl-none'}`}>
                     {msg.text}
                   </div>
@@ -381,8 +381,8 @@ const AdminDashboardPage: React.FC = () => {
               <div ref={messagesEndRef} />
             </div>
             <form onSubmit={handleSendReply} className="p-4 bg-white border-t border-gray-100 flex gap-2">
-              <input type="text" value={chatInput} onChange={e => setChatInput(e.target.value)} placeholder="__TYPE_MESSAGE__" className="flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none" />
-              <button type="submit" className="px-6 py-2 bg-brand-dark text-white font-bold rounded-lg">__SEND__</button>
+              <input type="text" value={chatInput} onChange={e => setChatInput(e.target.value)} placeholder="Nhập tin nhắn phản hồi..." className="flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none" />
+              <button type="submit" className="px-6 py-2 bg-brand-dark text-white font-bold rounded-lg">Gửi</button>
             </form>
           </div>
         </div>
