@@ -33,7 +33,7 @@ const RegisterPage: React.FC = () => {
             <span className="text-white font-serif font-bold text-2xl">B</span>
           </Link>
           <h2 className="text-2xl font-serif font-bold text-gray-900 mb-2">Tạo tài khoản mới</h2>
-          <p className="text-gray-500 text-sm">Gia nhập cộng đồng thượng lưu của BOOKINGHOTEL</p>
+          <p className="text-gray-500 text-sm">Đăng ký thành viên để dễ dàng quản lý đặt phòng và nhận ưu đãi riêng</p>
         </div>
 
         {error && <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm mb-6 text-center border border-red-100">{error}</div>}

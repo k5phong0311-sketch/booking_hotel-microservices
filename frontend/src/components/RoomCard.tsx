@@ -55,7 +55,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onBook }) => {
         </div>
         
         <p className="text-gray-500 text-sm leading-relaxed mb-6 flex-1">
-          {room.description || 'Không gian nghỉ dưỡng tinh tế, tràn ngập ánh sáng tự nhiên với đầy đủ tiện nghi hiện đại.'}
+          {room.description || 'Phòng nghỉ đầy đủ tiện nghi với không gian sạch sẽ, thoáng mát, phù hợp cho mọi nhu cầu lưu trú.'}
         </p>
 
         {/* Footer / Actions */}
