@@ -6,6 +6,7 @@ import './index.css'; // Tailwind CSS
 import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
 import HomePage from './pages/HomePage';
+import AboutPage from './pages/AboutPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import RoomDetailPage from './pages/RoomDetailPage';
@@ -25,6 +26,7 @@ const App: React.FC = () => {
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/rooms/:id" element={<RoomDetailPage />} />
@@ -49,7 +51,7 @@ const App: React.FC = () => {
           {/* 404 */}
           <Route path="*" element={
             <div style={{ textAlign: 'center', padding: 80 }}>
-              <h2>404 — Trang không tìm thấy</h2>
+              <h2>404 - Trang không tìm thấy</h2>
               <a href="/" style={{ color: '#e94560' }}>← Về trang chủ</a>
             </div>
           } />
