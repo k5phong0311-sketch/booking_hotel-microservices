@@ -35,7 +35,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (client.handshake.query.role === 'admin') {
       adminSockets.add(client.id);
       this.logger.log(`Admin joined: ${client.id}. Total admins: ${adminSockets.size}`);
-      // Broadcast t\u1edbi t\u1ea5t c\u1ea3 user l\u00e0 Admin \u0111ang online
       this.server.emit('adminStatus', { isOnline: true });
     }
   }
@@ -65,7 +64,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (data.requiresHuman) {
       if (adminSockets.size > 0) {
-        // Forward tin nh\u1eafn t\u1edbi t\u1ea5t c\u1ea3 admin (nh\u01b0ng s\u1eed d\u1ee5ng \u0111\u00fang event 'userMessage' \u0111\u1ec3 admin Dashboard nh\u1eadn \u0111\u01b0\u1ee3c)
         for (const adminId of adminSockets) {
           this.server.to(adminId).emit('userMessage', {
             message: data.message,

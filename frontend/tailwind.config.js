@@ -18,7 +18,7 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Playfair Display', 'serif'],
         serif: ['Playfair Display', 'serif'],
       }
     },

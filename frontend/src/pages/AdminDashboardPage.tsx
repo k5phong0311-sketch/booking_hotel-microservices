@@ -200,7 +200,7 @@ const AdminDashboardPage: React.FC = () => {
             <h2 className="text-xl font-bold text-gray-900">__ROOM_LIST__</h2>
             <button onClick={() => { setEditingRoom({}); setShowRoomModal(true); }} className="bg-brand-DEFAULT text-white px-4 py-2 rounded-lg font-bold text-sm">+ __ADD_ROOM__</button>
           </div>
-          <table className="w-full text-left">
+          <div className="overflow-x-auto"><table className="w-full text-left whitespace-nowrap">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-4 font-bold text-gray-900">__IMAGE__</th>
@@ -230,7 +230,7 @@ const AdminDashboardPage: React.FC = () => {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
 
@@ -287,7 +287,7 @@ const AdminDashboardPage: React.FC = () => {
 
       {activeTab === 'bookings' && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <table className="w-full text-left">
+          <div className="overflow-x-auto"><table className="w-full text-left whitespace-nowrap">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-4 font-bold text-gray-900">ID</th>
@@ -325,13 +325,13 @@ const AdminDashboardPage: React.FC = () => {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
 
       {activeTab === 'users' && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <table className="w-full text-left">
+          <div className="overflow-x-auto"><table className="w-full text-left whitespace-nowrap">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-4 font-bold text-gray-900">ID</th>
@@ -355,7 +355,7 @@ const AdminDashboardPage: React.FC = () => {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import api from '../services/api';
 
 const PaymentCallbackPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -12,6 +13,12 @@ const PaymentCallbackPage: React.FC = () => {
 
     if (resultCode === '0') {
       setStatus('SUCCESS');
+      // Make sure backend status is also updated in mock flow
+      api.post('/payments/momo/ipn', {
+         extraData: orderId,
+         resultCode: 0,
+         transId: 'MOCK_TRANS_ID',
+      }).catch(e => console.log(e));
     } else {
       setStatus('FAILED');
     }
@@ -20,12 +27,12 @@ const PaymentCallbackPage: React.FC = () => {
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-        {status === 'LOADING' && <h2>⏳ Đang kiểm tra giao dịch...</h2>}
+        {status === 'LOADING' && <h2>⌛ Đang kiểm tra giao dịch...</h2>}
         
         {status === 'SUCCESS' && (
           <>
-            <h2 style={{ color: '#2ecc71' }}>✅ Thanh toán thành công!</h2>
-            <p>Đơn đặt phòng của bạn đã được thanh toán qua MoMo.</p>
+            <h2 style={{ color: '#2ecc71' }}>✔️ Thanh toán thành công!</h2>
+            <p>Đơn đặt phòng của bạn đã được thanh toán.</p>
             <button style={styles.btn} onClick={() => navigate('/my-bookings')}>
               Xem lịch sử đặt phòng
             </button>
