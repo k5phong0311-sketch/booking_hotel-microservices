@@ -13,12 +13,14 @@ import BookingPage from './pages/BookingPage';
 import MyBookingsPage from './pages/MyBookingsPage';
 import ProfilePage from './pages/ProfilePage';
 import PaymentCallbackPage from './pages/PaymentCallbackPage';
+import ChatWidget from './components/ChatWidget';
 
 const App: React.FC = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Navbar />
+        <ChatWidget />
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<HomePage />} />

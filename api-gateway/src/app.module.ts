@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpModule } from '@nestjs/axios';
 import { ReviewModule } from './review/review.module';
 import { ProxyModule } from './proxy/proxy.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ProxyModule } from './proxy/proxy.module';
     HttpModule,
     ReviewModule,
     ProxyModule,
+    ChatModule,
   ],
 })
 export class AppModule {}
