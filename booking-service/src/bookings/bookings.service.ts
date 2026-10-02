@@ -17,6 +17,10 @@ export class BookingsService {
     private readonly httpService: HttpService,
   ) {}
 
+  async findAll(): Promise<Booking[]> {
+    return this.bookingRepo.find({ order: { createdAt: 'DESC' } });
+  }
+
   async create(dto: CreateBookingDto): Promise<Booking> {
     const checkIn = new Date(dto.checkIn);
     const checkOut = new Date(dto.checkOut);

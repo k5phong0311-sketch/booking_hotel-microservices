@@ -16,7 +16,7 @@ const RegisterPage: React.FC = () => {
     setError('');
     setLoading(true);
     try {
-      await authService.register({ email, password, fullName, phone });
+      await authService.register(email, password, fullName, phone);
       navigate('/login');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại.');

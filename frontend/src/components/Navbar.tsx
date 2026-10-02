@@ -38,7 +38,7 @@ const Navbar: React.FC = () => {
 
           {isAuthenticated ? (
             <div className="flex items-center gap-6">
-              {user?.role === 'admin' && (
+              {user?.role === 'ADMIN' && (
                 <Link to="/admin" className="text-sm font-bold text-brand-dark hover:text-brand-DEFAULT transition-colors">Admin Dashboard</Link>
               )}
               <Link to="/my-bookings" className="text-sm font-medium text-gray-600 hover:text-brand-DEFAULT transition-colors">Lịch sử đặt phòng</Link>

@@ -14,10 +14,7 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    try {
-      await login(email, password);
-      navigate('/');
-    } catch (err: any) {
+    try { const res = await fetch('http://localhost:3000/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) }); const data = await res.json(); if (!res.ok) throw new Error(data.message); login(data.access_token, data.user); navigate('/'); } catch (err: any) {
       setError(err.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại.');
     } finally {
       setLoading(false);

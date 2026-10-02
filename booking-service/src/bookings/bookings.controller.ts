@@ -11,6 +11,11 @@ export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
   // POST /api/bookings — Tạo đơn đặt phòng mới
+  @Get()
+  findAll() {
+    return this.bookingsService.findAll();
+  }
+
   @Post()
   create(@Body() dto: CreateBookingDto) {
     return this.bookingsService.create(dto);

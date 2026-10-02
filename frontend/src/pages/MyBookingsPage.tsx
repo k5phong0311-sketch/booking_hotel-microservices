@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { bookingService } from '../services/booking.service';
 import { Booking } from '../types';
 import Navbar from '../components/Navbar';
@@ -10,20 +11,21 @@ const MyBookingsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const location = useLocation();
+  const { user } = useAuth();
 
   useEffect(() => {
-    fetchBookings();
+    if (user) fetchBookings();
   }, []);
 
   const fetchBookings = () => {
     setLoading(true);
-    bookingService.getMyBookings()
+    bookingService.getMyBookings(user.id)
       .then(data => setBookings(data))
       .catch(() => setError('Lỗi khi tải lịch sử đặt phòng.'))
       .finally(() => setLoading(false));
   };
 
-  const handleCancel = async (bookingId: string) => {
+  const handleCancel = async (bookingId: number) => {
     if (!window.confirm('Bạn có chắc chắn muốn hủy đơn đặt phòng này?')) return;
     try {
       await bookingService.cancel(bookingId);

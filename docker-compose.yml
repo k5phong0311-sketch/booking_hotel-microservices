@@ -10,7 +10,7 @@ services:
       MYSQL_USER: hotel_user
       MYSQL_PASSWORD: hotel_password
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -47,8 +47,8 @@ services:
     restart: always
     environment:
       - DB_HOST=mysql
-      - ROOM_SERVICE_URL=http://room-service:3000
-      - PAYMENT_SERVICE_URL=http://payment-service:3000
+      - ROOM_SERVICE_URL=http://room-service:3002
+      - PAYMENT_SERVICE_URL=http://payment-service:3004
     depends_on:
       mysql:
         condition: service_healthy
@@ -72,10 +72,10 @@ services:
     environment:
       - DB_HOST=mysql
       - JWT_SECRET=super_secret_key_123
-      - USER_SERVICE_URL=http://user-service:3000
-      - ROOM_SERVICE_URL=http://room-service:3000
-      - BOOKING_SERVICE_URL=http://booking-service:3000
-      - PAYMENT_SERVICE_URL=http://payment-service:3000
+      - USER_SERVICE_URL=http://user-service:3001
+      - ROOM_SERVICE_URL=http://room-service:3002
+      - BOOKING_SERVICE_URL=http://booking-service:3003
+      - PAYMENT_SERVICE_URL=http://payment-service:3004
       # - GEMINI_API_KEY=your_key_here
     depends_on:
       mysql:
