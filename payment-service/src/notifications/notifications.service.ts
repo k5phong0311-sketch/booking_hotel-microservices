@@ -110,6 +110,41 @@ export class NotificationsService {
     });
   }
 
+  async sendPaymentRefund(
+    userId: number,
+    bookingId: number,
+    refundAmount: number,
+    reason?: string,
+  ): Promise<Notification> {
+    return this.send({
+      userId,
+      bookingId,
+      type: NotificationType.PAYMENT_REFUNDED,
+      title: `[BookingHotel] Xác nhận hoàn tiền cho đơn #${bookingId}`,
+      content:
+        `Xin chào,\n\n` +
+        `Yêu cầu hoàn tiền cho đơn đặt phòng #${bookingId} của bạn đã được xử lý thành công.\n` +
+        `Số tiền hoàn: ${Number(refundAmount).toLocaleString('vi-VN')} VNĐ\n` +
+        `Lý do: ${reason || 'Khách hủy đặt phòng / Hoàn tiền theo chính sách'}\n\n` +
+        `Tiền sẽ được hoàn trả về tài khoản của bạn trong thời gian sớm nhất!`,
+    });
+  }
+
+  async markAsRead(id: number): Promise<Notification> {
+    await this.notificationRepo.update(id, {
+      isRead: true,
+      readAt: new Date(),
+    });
+    return this.notificationRepo.findOne({ where: { id } });
+  }
+
+  async getUnreadCount(userId: number): Promise<{ unreadCount: number }> {
+    const unreadCount = await this.notificationRepo.count({
+      where: { userId, isRead: false },
+    });
+    return { unreadCount };
+  }
+
   async findByUser(userId: number): Promise<Notification[]> {
     return this.notificationRepo.find({
       where: { userId },

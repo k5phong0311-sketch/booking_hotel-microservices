@@ -4,6 +4,8 @@ export enum NotificationType {
   PAYMENT_SUCCESS = 'PAYMENT_SUCCESS',
   PAYMENT_FAILED = 'PAYMENT_FAILED',
   BOOKING_CONFIRMED = 'BOOKING_CONFIRMED',
+  PAYMENT_REFUNDED = 'PAYMENT_REFUNDED',
+  PAYMENT_CANCELLED = 'PAYMENT_CANCELLED',
 }
 
 export enum NotificationStatus {
@@ -36,6 +38,12 @@ export class Notification {
 
   @Column({ type: 'enum', enum: NotificationStatus, default: NotificationStatus.SENT })
   status: NotificationStatus;
+
+  @Column({ type: 'boolean', default: false })
+  isRead: boolean;
+
+  @Column({ type: 'datetime', nullable: true })
+  readAt: Date;
 
   @CreateDateColumn()
   createdAt: Date;
