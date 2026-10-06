@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { bookingService } from '../services/booking.service';
 import { Booking } from '../types';
+import api from '../services/api';
 import Navbar from '../components/Navbar';
 import LoadingSpinner from '../components/LoadingSpinner';
 
@@ -11,6 +12,7 @@ const MyBookingsPage: React.FC = () => {
   const [showQR, setShowQR] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [payingId, setPayingId] = useState<number | null>(null);
   const location = useLocation();
   const { user } = useAuth();
 
@@ -33,6 +35,28 @@ const MyBookingsPage: React.FC = () => {
       fetchBookings();
     } catch (err: any) {
       alert(err.response?.data?.message || 'Lỗi khi hủy phòng');
+    }
+  };
+
+  const handlePayAgain = async (booking: Booking) => {
+    if (!user) return;
+    setPayingId(booking.id);
+    try {
+      const res = await api.post('/payments', {
+        bookingId: booking.id,
+        userId: user.id,
+        amount: Number(booking.totalPrice),
+        method: 'MOMO',
+      });
+      if (res.data?.momoUrl) {
+        window.location.href = res.data.momoUrl;
+      } else {
+        alert('Không nhận được đường dẫn thanh toán MoMo.');
+        setPayingId(null);
+      }
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Lỗi khi khởi tạo thanh toán MoMo');
+      setPayingId(null);
     }
   };
 
@@ -126,23 +150,36 @@ const MyBookingsPage: React.FC = () => {
                       <p className="text-xl font-bold text-brand-dark font-serif">{Number(booking.totalPrice).toLocaleString('vi-VN')} đ</p>
                     </div>
                     
-                    {booking.status === 'CONFIRMED' && (
-                      <button 
-                        onClick={() => setShowQR(booking.id)}
-                        className="text-sm font-bold text-brand-dark hover:text-brand-DEFAULT hover:underline px-2 py-1 mr-4"
-                      >
-                        Xem thẻ phòng
-                      </button>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {booking.status === 'CONFIRMED' && (
+                        <button 
+                          onClick={() => setShowQR(booking.id)}
+                          className="text-sm font-bold text-brand-dark hover:text-brand-DEFAULT hover:underline px-2 py-1"
+                        >
+                          Xem thẻ phòng
+                        </button>
+                      )}
 
-                    {(booking.status === 'PENDING' || booking.status === 'CONFIRMED') && (
-                      <button 
-                        onClick={() => handleCancel(booking.id)}
-                        className="text-sm font-medium text-red-500 hover:text-red-700 hover:underline px-2 py-1"
-                      >
-                        Hủy phòng
-                      </button>
-                    )}
+                      {booking.status === 'PENDING' && (
+                        <button 
+                          onClick={() => handlePayAgain(booking)}
+                          disabled={payingId === booking.id}
+                          className="px-4 py-1.5 bg-[#a50064] hover:bg-[#860051] text-white text-xs font-bold rounded-lg shadow-sm transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                        >
+                          <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                          {payingId === booking.id ? 'Đang mở MoMo...' : 'Thanh toán MoMo'}
+                        </button>
+                      )}
+
+                      {(booking.status === 'PENDING' || booking.status === 'CONFIRMED') && (
+                        <button 
+                          onClick={() => handleCancel(booking.id)}
+                          className="text-sm font-medium text-red-500 hover:text-red-700 hover:underline px-2 py-1"
+                        >
+                          Hủy phòng
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

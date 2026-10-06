@@ -14,12 +14,19 @@ export class MomoService {
   ) {}
 
   async createPayment(orderId: number, amount: number) {
-    const endpoint = this.configService.get<string>('MOMO_ENDPOINT');
-    const partnerCode = this.configService.get<string>('MOMO_PARTNER_CODE');
-    const accessKey = this.configService.get<string>('MOMO_ACCESS_KEY');
-    const secretKey = this.configService.get<string>('MOMO_SECRET_KEY');
-    const redirectUrl = this.configService.get<string>('MOMO_REDIRECT_URL');
-    const ipnUrl = this.configService.get<string>('MOMO_IPN_URL');
+    const endpoint = this.configService.get<string>('MOMO_ENDPOINT') || 'https://test-payment.momo.vn/v2/gateway/api/create';
+    let partnerCode = this.configService.get<string>('MOMO_PARTNER_CODE');
+    let accessKey = this.configService.get<string>('MOMO_ACCESS_KEY');
+    let secretKey = this.configService.get<string>('MOMO_SECRET_KEY');
+
+    if (!partnerCode || partnerCode === 'MOMO') {
+      partnerCode = 'MOMOBKUN20180529';
+      accessKey = 'klm05TvNBzhg7h7j';
+      secretKey = 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa';
+    }
+
+    const redirectUrl = this.configService.get<string>('MOMO_REDIRECT_URL') || 'http://localhost:5173/payment/callback';
+    const ipnUrl = this.configService.get<string>('MOMO_IPN_URL') || 'http://localhost:3004/api/payments/momo/ipn';
 
     const orderInfo = `Thanh toan don hang #${orderId}`;
     const amountStr = String(amount);
