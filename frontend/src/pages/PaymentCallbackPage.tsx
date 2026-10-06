@@ -9,16 +9,17 @@ const PaymentCallbackPage: React.FC = () => {
 
   useEffect(() => {
     const resultCode = searchParams.get('resultCode');
-    const orderId = searchParams.get('orderId');
+    const paymentId = searchParams.get('extraData') || searchParams.get('orderId')?.split('_')[0] || searchParams.get('orderId');
+    const transId = searchParams.get('transId') || 'MOMO_' + Date.now();
 
     if (resultCode === '0') {
       setStatus('SUCCESS');
-      // Make sure backend status is also updated in mock flow
+      // Update backend payment status & confirm booking
       api.post('/payments/momo/ipn', {
-         extraData: orderId,
+         extraData: paymentId,
          resultCode: 0,
-         transId: 'MOCK_TRANS_ID',
-      }).catch(e => console.log(e));
+         transId: transId,
+      }).catch(e => console.log('IPN error:', e));
     } else {
       setStatus('FAILED');
     }

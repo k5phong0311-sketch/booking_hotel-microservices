@@ -1,4 +1,4 @@
-import { IsNumber, IsEnum, Min } from 'class-validator';
+import { IsNumber, IsEnum, Min, IsOptional } from 'class-validator';
 
 export enum PaymentMethod {
   CASH = 'CASH',
@@ -18,6 +18,8 @@ export class CreatePaymentDto {
   @Min(0)
   amount: number;
 
+  @IsOptional()
   @IsEnum(PaymentMethod)
-  method: PaymentMethod;
+  method?: PaymentMethod;
 }
+

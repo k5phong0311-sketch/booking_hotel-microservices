@@ -21,15 +21,16 @@ export class PaymentsService {
   ) {}
 
   async create(dto: CreatePaymentDto): Promise<Payment> {
+    const method = dto.method || PaymentMethod.MOMO;
     const payment = this.paymentRepo.create({
       ...dto,
-      method: dto.method || PaymentMethod.TRANSFER,
+      method,
       status: PaymentStatus.PENDING,
     });
     const saved = await this.paymentRepo.save(payment);
 
     // Nếu chọn thanh toán MOMO thì giữ trạng thái PENDING
-    if (dto.method === PaymentMethod.MOMO) {
+    if (method === PaymentMethod.MOMO) {
       return saved;
     }
 

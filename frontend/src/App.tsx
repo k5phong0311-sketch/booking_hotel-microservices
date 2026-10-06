@@ -47,6 +47,9 @@ const App: React.FC = () => {
           <Route path="/payment/callback" element={
             <PaymentCallbackPage />
           } />
+          <Route path="/payment-callback" element={
+            <PaymentCallbackPage />
+          } />
 
           {/* 404 */}
           <Route path="*" element={

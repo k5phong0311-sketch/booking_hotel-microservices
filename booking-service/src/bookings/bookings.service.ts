@@ -71,16 +71,16 @@ export class BookingsService {
 
     // Bước 4: Gọi payment-service để sinh link MoMo/Thanh toán
     try {
+      const paymentServiceUrl = process.env.PAYMENT_SERVICE_URL || 'http://localhost:3004';
       await firstValueFrom(
         this.httpService.post(
-          `${process.env.PAYMENT_SERVICE_URL}/api/payments`,
-          { bookingId: saved.id, userId: dto.userId, amount: saved.totalPrice },
+          `${paymentServiceUrl}/api/payments`,
+          { bookingId: saved.id, userId: dto.userId, amount: saved.totalPrice, method: 'MOMO' },
           { timeout: 5000 },
         ),
       );
-    } catch {
-      await this.bookingRepo.update(saved.id, { status: BookingStatus.FAILED });
-      throw new HttpException('Khởi tạo thanh toán thất bại, vui lòng thử lại', HttpStatus.PAYMENT_REQUIRED);
+    } catch (err: any) {
+      this.logger.warn(`Không thể tạo payment tự động từ booking-service: ${err?.message}`);
     }
 
     return saved;
