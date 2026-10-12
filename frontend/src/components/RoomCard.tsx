@@ -18,7 +18,10 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onBook }) => {
   return (
     <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full">
       {/* Image Container */}
-      <div className="relative h-64 bg-gray-100 overflow-hidden">
+      <div 
+        onClick={() => navigate(`/rooms/${room.id}`)}
+        className="relative h-64 bg-gray-100 overflow-hidden cursor-pointer"
+      >
         {room.imageUrl ? (
           <img 
             src={room.imageUrl} 
@@ -48,15 +51,28 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onBook }) => {
             <span className="text-brand-DEFAULT text-xs font-bold tracking-wider uppercase mb-1 block">
               {typeLabel[room.type] || room.type} • Tầng {room.floor}
             </span>
-            <h3 className="text-xl font-serif font-bold text-gray-900 group-hover:text-brand-dark transition-colors">
+            <h3 
+              onClick={() => navigate(`/rooms/${room.id}`)}
+              className="text-xl font-serif font-bold text-gray-900 group-hover:text-brand-dark transition-colors cursor-pointer"
+            >
               {room.name}
             </h3>
           </div>
         </div>
         
-        <p className="text-gray-500 text-sm leading-relaxed mb-6 flex-1">
+        <p className="text-gray-500 text-sm leading-relaxed mb-4 flex-1">
           {room.description || 'Phòng nghỉ đầy đủ tiện nghi với không gian sạch sẽ, thoáng mát, phù hợp cho mọi nhu cầu lưu trú.'}
         </p>
+
+        <div className="mb-4">
+          <button
+            type="button"
+            onClick={() => navigate(`/rooms/${room.id}`)}
+            className="text-xs font-semibold text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>⭐</span> Xem chi tiết & Đánh giá phòng
+          </button>
+        </div>
 
         {/* Footer / Actions */}
         <div className="flex items-end justify-between pt-4 border-t border-gray-100">
