@@ -45,21 +45,23 @@ Hệ thống cho phép người dùng đăng ký, đăng nhập, xem danh sách 
 ## ✨ Tính năng nổi bật
 
 ### 1. Dành cho Khách hàng (Customer Web Portal)
-- 🔍 **Tìm kiếm & Xem danh sách phòng:** Xem danh sách phòng trực quan, lọc theo loại phòng (`SINGLE`, `DOUBLE`, `DELUXE`, `SUITE`), khoảng giá và trạng thái phòng trống.
+- 🔍 **Tìm kiếm & Xem danh sách phòng:** Xem danh sách phòng trực quan, lọc theo loại phòng (`SINGLE`, `DOUBLE`, `DELUXE`, `SUITE`), lọc theo khoảng giá (`GET /api/rooms/price`) và trạng thái phòng trống.
 - 📝 **Đặt phòng theo ngày:** Đặt phòng nhanh chóng theo ngày nhận - trả phòng, tự động tính số đêm lưu trú và tổng chi phí.
-- 🏷️ **Áp dụng Mã giảm giá (Voucher):** Nhập mã khuyến mãi để kiểm tra tính hợp lệ và chiết khấu trực tiếp vào tổng tiền thanh toán.
-- 💳 **Thanh toán giả lập (MoMo Sandbox / Tiền mặt):**
-  - Hỗ trợ thanh toán giả lập qua cổng MoMo Sandbox hoặc đặt trước thanh toán tại quầy.
-  - Tích hợp trang kết quả thanh toán Callback, tự động cập nhật trạng thái đơn đặt phòng.
+- 🏷️ **Áp dụng Mã giảm giá (Voucher):** Chọn nhanh hoặc nhập mã khuyến mãi để kiểm tra tính hợp lệ và chiết khấu trực tiếp vào tổng tiền thanh toán.
+- 💳 **Thanh toán giả lập (Cổng MoMo Thẻ ATM nội địa Napas / Tiền mặt):**
+  - Hỗ trợ thanh toán qua cổng MoMo Thẻ ATM nội địa Napas (`/payment/momo-atm` với xác thực OTP) hoặc đặt trước thanh toán tại quầy.
+  - Tích hợp trang kết quả thanh toán Callback, tự động cập nhật trạng thái đơn đặt phòng và chống tạo trùng giao dịch `PENDING`.
   - Hỗ trợ **Thanh toán lại** trực tiếp từ trang *Lịch sử đặt phòng* nếu đơn đang ở trạng thái chờ (`PENDING`).
 - 📱 **Quản lý lịch sử đặt phòng & Thẻ phòng điện tử (QR Code):** Theo dõi trạng thái đơn đặt phòng, hủy đơn và nhận mã QR Check-in điện tử sau khi đơn được xác nhận (`CONFIRMED`).
-- ⭐ **Đánh giá & Phản hồi (Review Service):** Gửi đánh giá sao và nhận xét trải nghiệm cho từng phòng nghỉ.
+- ⭐ **Đánh giá & Phản hồi (Review Service):** Gửi đánh giá sao (1-5 ★) và nhận xét trải nghiệm trực tiếp từ lịch sử đặt phòng hoặc trang chi tiết phòng.
+- 🔔 **Thông báo & Hồ sơ cá nhân:** Nhận thông báo xác nhận thanh toán / hoàn tiền trên thanh điều hướng và chỉnh sửa thông tin cá nhân (`/profile`).
 
 ### 2. Dành cho Quản trị viên (Admin Dashboard)
-- 📊 **Thống kê doanh thu & Tổng quan (Overview):** Biểu đồ doanh thu theo ngày và phát hành chiến dịch mã giảm giá (Voucher).
-- 👥 **Quản lý Người dùng (User & Auth):** Xem danh sách tài khoản, cập nhật thông tin và quản lý phân quyền (`ADMIN` / `CUSTOMER`).
-- 🏨 **Quản lý Danh mục phòng (Room Catalog):** Thêm phòng mới, cập nhật giá phòng, mô tả, hình ảnh và trạng thái phòng trống.
+- 📊 **Thống kê doanh thu & Quản lý Voucher (Overview):** Thẻ KPI thống kê doanh thu thực tế từ Payment Service, biểu đồ doanh thu, phát hành/cập nhật số lượng mã giảm giá và theo dõi số lượt **Đã dùng / Còn lại**.
+- 👥 **Quản lý Người dùng (User & Auth):** Xem danh sách tài khoản, cập nhật phân quyền (`ADMIN` / `CUSTOMER`) và xóa người dùng.
+- 🏨 **Quản lý Danh mục phòng (Room Catalog):** Thêm phòng mới, chỉnh sửa thông tin phòng, xóa phòng và bật/tắt nhanh trạng thái phòng trống (`toggle-availability`).
 - 📋 **Quản lý Đơn đặt phòng (Booking Management):** Theo dõi toàn bộ danh sách đặt phòng, xác nhận đơn (`CONFIRMED`) hoặc hủy đơn (`CANCELLED`).
+- 💰 **Quản lý Giao dịch & Hoàn tiền (Payment & Refund Management):** Theo dõi lịch sử giao dịch thanh toán (`MOMO`, `CASH`), thực hiện **Hoàn tiền (`Refund`)** cho giao dịch thành công hoặc hủy giao dịch đang chờ.
 
 ---
 
@@ -74,7 +76,7 @@ Hệ thống cho phép người dùng đăng ký, đăng nhập, xem danh sách 
 | **Database** | MySQL 8.0 | Mô hình **Database-per-Service** (5 cơ sở dữ liệu độc lập) |
 | **Giao tiếp nội bộ** | REST API (HTTP / Axios) | Giao tiếp đồng bộ giữa API Gateway và các Microservices |
 | **Xác thực** | JWT (JSON Web Token), Bcrypt | Stateless Authentication, mã hóa mật khẩu an toàn |
-| **Thanh toán** | MoMo Payment (Giả lập / Sandbox) | Xử lý giao dịch thanh toán và IPN/Callback |
+| **Thanh toán** | MoMo ATM Napas Gateway (Sandbox) | Xử lý giao dịch thanh toán thẻ nội địa Napas và IPN/Callback |
 | **Đóng gói & Triển khai** | Docker, Docker Compose | Đóng gói và khởi chạy đồng bộ toàn bộ hệ thống |
 
 ---
@@ -108,7 +110,7 @@ flowchart TD
     Gateway -->|REST API /auth, /users| UserSvc
     Gateway -->|REST API /rooms| RoomSvc
     Gateway -->|REST API /bookings| BookingSvc
-    Gateway -->|REST API /payments, /vouchers| PaymentSvc
+    Gateway -->|REST API /payments, /vouchers, /notifications| PaymentSvc
 
     BookingSvc -->|REST: Check availability| RoomSvc
     BookingSvc -->|REST: Init payment| PaymentSvc
@@ -420,17 +422,23 @@ Mọi request từ Frontend đều đi qua **API Gateway** tại `http://localho
 | `PATCH` | `/api/bookings/:id/cancel` | Hủy đơn đặt phòng | ✅ |
 | `PATCH` | `/api/bookings/:id/status` | Cập nhật trạng thái đơn đặt phòng | ✅ |
 
-### 4. Payment & Notification Service (`/api/payments`, `/api/vouchers`)
+### 4. Payment & Notification Service (`/api/payments`, `/api/vouchers`, `/api/notifications`)
 | Phương thức | Endpoint | Mô tả | Xác thực JWT |
 |:---|:---|:---|:---:|
-| `POST` | `/api/payments` | Khởi tạo giao dịch thanh toán (giả lập) | ✅ |
+| `POST` | `/api/payments` | Khởi tạo giao dịch thanh toán (MoMo ATM Napas / Tiền mặt) | ✅ |
 | `POST` | `/api/payments/momo/ipn` | Nhận kết quả callback thanh toán MoMo | ❌ |
-| `GET` | `/api/payments` | Xem danh sách giao dịch thanh toán | ✅ |
-| `GET` | `/api/payments/stats/summary`| Thống kê doanh thu và số lượng giao dịch | ✅ |
+| `GET` | `/api/payments` | Xem danh sách giao dịch thanh toán (Admin) | ✅ |
+| `GET` | `/api/payments/stats/summary`| Thống kê doanh thu thực tế và số lượng giao dịch | ✅ |
 | `GET` | `/api/payments/booking/:bookingId` | Tra cứu thanh toán theo mã đặt phòng | ✅ |
 | `GET` | `/api/payments/user/:userId` | Lịch sử giao dịch của người dùng | ✅ |
-| `POST` | `/api/payments/:id/refund` | Hoàn tiền giao dịch | ✅ |
-| `POST` | `/api/vouchers/apply` | Kiểm tra và áp dụng mã giảm giá | ✅ |
+| `POST` | `/api/payments/:id/refund` | Hoàn tiền giao dịch & hủy đơn đặt phòng (Admin) | ✅ |
+| `POST` | `/api/payments/:id/cancel` | Hủy giao dịch đang chờ thanh toán (Admin) | ✅ |
+| `GET` | `/api/vouchers` | Lấy danh sách mã giảm giá (đã dùng / còn lại) | ❌ |
+| `POST` | `/api/vouchers/broadcast` | Phát hành mới hoặc cập nhật số lượng mã giảm giá (Admin) | ✅ |
+| `POST` | `/api/vouchers/apply` | Kiểm tra và áp dụng mã giảm giá (Pessimistic Lock) | ✅ |
+| `DELETE` | `/api/vouchers/:id` | Xóa / thu hồi mã giảm giá (Admin) | ✅ |
+| `GET` | `/api/notifications/user/:userId` | Lấy danh sách thông báo của người dùng | ✅ |
+| `PATCH` | `/api/notifications/:id/read` | Đánh dấu thông báo đã đọc | ✅ |
 
 ### 5. Review Service (`/api/reviews`)
 | Phương thức | Endpoint | Mô tả | Xác thực JWT |
