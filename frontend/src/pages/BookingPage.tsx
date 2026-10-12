@@ -155,17 +155,28 @@ const BookingPage: React.FC = () => {
               </div>
 
               <div style={styles.field}>
-                <label style={styles.label}>PH\u01af\u01a0NG TH\u1ee8C THANH TO\u00c1N</label>
+                <label style={styles.label}>PHƯƠNG THỨC THANH TOÁN</label>
                 <select 
                   style={styles.select} 
                   value={paymentMethod} 
                   onChange={e => setPaymentMethod(e.target.value as PaymentMethodType)}
                 >
-                  <option value="MOMO_DOMESTIC">Thanh to\u00e1n MoMo (Th\u1ebb n\u1ed9i \u0111\u1ecba)</option>
-                  <option value="MOMO_INTERNATIONAL">Thanh to\u00e1n MoMo (Th\u1ebb qu\u1ed1c t\u1ebf)</option>
-                  <option value="CARD">Th\u1ebb t\u00edn d\u1ee5ng / Th\u1ebb ghi n\u1ee3</option>
-                  <option value="TRANSFER">Chuy\u1ec3n kho\u1ea3n ng\u00e2n h\u00e0ng</option>
+                  <option value="MOMO_DOMESTIC">Thanh toán MoMo (Thẻ nội địa ATM)</option>
+                  <option value="MOMO_INTERNATIONAL">Thanh toán MoMo (Thẻ quốc tế)</option>
+                  <option value="CARD">Thẻ tín dụng / Thẻ ghi nợ (Trực tiếp)</option>
+                  <option value="TRANSFER">Chuyển khoản ngân hàng / Tiền mặt</option>
                 </select>
+                {paymentMethod.startsWith('MOMO') && (
+                  <div style={{ marginTop: 8, padding: '12px 14px', background: '#161822', border: '1px dashed #c5a059', fontSize: 12, color: '#ccc', lineHeight: 1.7 }}>
+                    <div style={{ color: '#c5a059', fontWeight: 700, marginBottom: 4 }}>
+                      💡 THÔNG TIN THẺ TEST MOMO SANDBOX (Nhập đúng để không bị từ chối):
+                    </div>
+                    <div>• Số thẻ ATM nội địa: <strong style={{ color: '#fff', userSelect: 'all' }}>9704000000000018</strong> (viết liền)</div>
+                    <div>• Tên chủ thẻ: <strong style={{ color: '#fff', userSelect: 'all' }}>NGUYEN VAN A</strong></div>
+                    <div>• Ngày phát hành (MM/YY): <strong style={{ color: '#fff', userSelect: 'all' }}>03/07</strong></div>
+                    <div>• Mã xác thực OTP: Nhập chữ <strong style={{ color: '#2ecc71', userSelect: 'all' }}>OTP</strong> (viết hoa)</div>
+                  </div>
+                )}
               </div>
 
               {nights > 0 && (

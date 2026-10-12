@@ -22,12 +22,22 @@ export class PaymentsService {
 
   async create(dto: CreatePaymentDto): Promise<Payment> {
     const method = dto.method || PaymentMethod.MOMO;
-    const payment = this.paymentRepo.create({
-      ...dto,
-      method,
-      status: PaymentStatus.PENDING,
+    let saved = await this.paymentRepo.findOne({
+      where: { bookingId: dto.bookingId, status: PaymentStatus.PENDING },
     });
-    const saved = await this.paymentRepo.save(payment);
+
+    if (saved) {
+      saved.amount = dto.amount;
+      saved.method = method;
+      saved = await this.paymentRepo.save(saved);
+    } else {
+      const payment = this.paymentRepo.create({
+        ...dto,
+        method,
+        status: PaymentStatus.PENDING,
+      });
+      saved = await this.paymentRepo.save(payment);
+    }
 
     // Nếu chọn thanh toán MOMO thì giữ trạng thái PENDING
     if (method === PaymentMethod.MOMO) {

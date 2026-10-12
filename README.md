@@ -362,12 +362,23 @@ VITE_API_URL=http://localhost:3000/api
 
 ---
 
-## 🛡️ Tài khoản dùng thử
+## 🛡️ Tài khoản dùng thử & Thẻ Test MoMo Sandbox
 
+### 1. Tài khoản hệ thống
 | Vai trò | Email đăng nhập | Mật khẩu | Quyền hạn và Chức năng |
 |:---|:---|:---|:---|
 | **Quản trị viên (Admin)** | `admin@bookinghotel.com` | `admin123` | Truy cập Admin Dashboard, xem thống kê doanh thu, quản lý phòng, duyệt/hủy đơn đặt phòng và quản lý người dùng. |
 | **Khách hàng (Customer)** | `customer@bookinghotel.com` | `123456` | Xem danh sách phòng, đặt phòng theo ngày, áp dụng voucher, thanh toán giả lập, quản lý lịch sử đặt phòng và đánh giá phòng. |
+
+### 2. Thông tin thẻ ATM Test trên cổng MoMo Sandbox (`test-payment.momo.vn`)
+Khi chọn phương thức **Thanh toán MoMo (Thẻ nội địa ATM)**, sử dụng đúng bộ thẻ test chính thức của MoMo Developers dưới đây:
+
+| Trường thông tin | Giá trị nhập | Ghi chú |
+|:---|:---|:---|
+| **Số thẻ ATM** | `9704000000000018` | Viết liền 16 số (Kịch bản: Thanh toán thành công) |
+| **Tên chủ thẻ** | `NGUYEN VAN A` | Viết hoa không dấu |
+| **Ngày phát hành (MM/YY)** | `03/07` | Tháng 03 / Năm 07 |
+| **Mã xác thực OTP** | `OTP` | Nhập đúng 3 chữ cái **`OTP`** viết hoa |
 
 ---
 

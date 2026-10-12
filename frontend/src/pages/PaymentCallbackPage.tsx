@@ -7,23 +7,39 @@ const PaymentCallbackPage: React.FC = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState<'LOADING' | 'SUCCESS' | 'FAILED'>('LOADING');
 
+  const paymentId = searchParams.get('extraData') || searchParams.get('orderId')?.split('_')[0] || searchParams.get('orderId');
+  const transId = searchParams.get('transId') || 'MOMO_' + Date.now();
+  const momoMessage = searchParams.get('message') || '';
+
   useEffect(() => {
     const resultCode = searchParams.get('resultCode');
-    const paymentId = searchParams.get('extraData') || searchParams.get('orderId')?.split('_')[0] || searchParams.get('orderId');
-    const transId = searchParams.get('transId') || 'MOMO_' + Date.now();
 
     if (resultCode === '0') {
       setStatus('SUCCESS');
-      // Update backend payment status & confirm booking
       api.post('/payments/momo/ipn', {
-         extraData: paymentId,
-         resultCode: 0,
-         transId: transId,
+        extraData: paymentId,
+        resultCode: 0,
+        transId: transId,
       }).catch(e => console.log('IPN error:', e));
     } else {
       setStatus('FAILED');
     }
-  }, [searchParams]);
+  }, [searchParams, paymentId, transId]);
+
+  const handleForceConfirmDemo = async () => {
+    try {
+      setStatus('LOADING');
+      await api.post('/payments/momo/ipn', {
+        extraData: paymentId,
+        resultCode: 0,
+        transId: 'DEMO_' + Date.now(),
+      });
+      setStatus('SUCCESS');
+    } catch (e) {
+      alert('Không thể xác nhận giao dịch.');
+      setStatus('FAILED');
+    }
+  };
 
   return (
     <div style={styles.page}>
@@ -32,8 +48,8 @@ const PaymentCallbackPage: React.FC = () => {
         
         {status === 'SUCCESS' && (
           <>
-            <h2 style={{ color: '#2ecc71' }}>✔️ Thanh toán thành công!</h2>
-            <p>Đơn đặt phòng của bạn đã được thanh toán.</p>
+            <h2 style={{ color: '#2ecc71', marginBottom: 12 }}>✔️ Thanh toán thành công!</h2>
+            <p style={{ color: '#555' }}>Đơn đặt phòng của bạn đã được thanh toán và xác nhận.</p>
             <button style={styles.btn} onClick={() => navigate('/my-bookings')}>
               Xem lịch sử đặt phòng
             </button>
@@ -42,11 +58,29 @@ const PaymentCallbackPage: React.FC = () => {
 
         {status === 'FAILED' && (
           <>
-            <h2 style={{ color: '#e74c3c' }}>❌ Thanh toán thất bại</h2>
-            <p>Giao dịch của bạn đã bị hủy hoặc xảy ra lỗi.</p>
-            <button style={{ ...styles.btn, background: '#e74c3c' }} onClick={() => navigate('/')}>
-              Quay lại trang chủ
-            </button>
+            <h2 style={{ color: '#e74c3c', marginBottom: 12 }}>❌ Thanh toán bị từ chối trên MoMo Sandbox</h2>
+            {momoMessage && (
+              <p style={{ color: '#c0392b', fontSize: 13, background: '#fdecea', padding: 10, borderRadius: 6, marginBottom: 12 }}>
+                Lý do từ cổng MoMo: <strong>{momoMessage}</strong>
+              </p>
+            )}
+            <div style={{ textAlign: 'left', background: '#f8f9fa', padding: 14, borderRadius: 8, fontSize: 13, color: '#333', marginBottom: 16, border: '1px solid #e0e0e0' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: 6, color: '#d82d8b' }}>📌 Lưu ý bộ thẻ Test chuẩn của MoMo Sandbox:</div>
+              <div>• Số thẻ ATM: <strong>9704000000000018</strong> (viết liền)</div>
+              <div>• Tên chủ thẻ: <strong>NGUYEN VAN A</strong></div>
+              <div>• Ngày phát hành: <strong>03/07</strong></div>
+              <div>• Mã OTP: Nhập đúng chữ <strong>OTP</strong> (viết hoa)</div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {paymentId && (
+                <button style={{ ...styles.btn, marginTop: 0, background: '#2ecc71' }} onClick={handleForceConfirmDemo}>
+                  ✔️ Xác nhận thanh toán ngay (Chế độ Demo)
+                </button>
+              )}
+              <button style={{ ...styles.btn, marginTop: 0, background: '#e74c3c' }} onClick={() => navigate('/my-bookings')}>
+                Xem đơn đặt phòng
+              </button>
+            </div>
           </>
         )}
       </div>
@@ -55,8 +89,8 @@ const PaymentCallbackPage: React.FC = () => {
 };
 
 const styles = {
-  page: { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#f5f7fa' },
-  card: { background: '#fff', padding: 40, borderRadius: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.1)', textAlign: 'center' as const, maxWidth: 400 },
+  page: { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#f5f7fa', padding: 20 },
+  card: { background: '#fff', padding: 40, borderRadius: 12, boxShadow: '0 4px 20px rgba(0,0,0,0.1)', textAlign: 'center' as const, maxWidth: 460, width: '100%' },
   btn: { marginTop: 20, padding: '12px 24px', background: '#3498db', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 'bold' }
 };
 
