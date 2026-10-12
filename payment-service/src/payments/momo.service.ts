@@ -33,7 +33,7 @@ export class MomoService {
     const orderIdStr = `${orderId}_${Date.now()}`;
     const requestId = String(Date.now());
     const extraData = String(orderId);
-    const requestType = 'payWithATM'; // MoMo supports payWithCC, payWithATM, captureWallet. Use payWithATM for domestic cards as per PDF.
+    const requestType = 'payWithCC'; // Switch to payWithCC as MoMo's NAPAS payWithATM sandbox is returning 1002 issuer rejection
 
     const rawSignature = `accessKey=${accessKey}&amount=${amountStr}&extraData=${extraData}&ipnUrl=${ipnUrl}&orderId=${orderIdStr}&orderInfo=${orderInfo}&partnerCode=${partnerCode}&redirectUrl=${redirectUrl}&requestId=${requestId}&requestType=${requestType}`;
 

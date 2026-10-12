@@ -169,12 +169,12 @@ const BookingPage: React.FC = () => {
                 {paymentMethod.startsWith('MOMO') && (
                   <div style={{ marginTop: 8, padding: '12px 14px', background: '#161822', border: '1px dashed #c5a059', fontSize: 12, color: '#ccc', lineHeight: 1.7 }}>
                     <div style={{ color: '#c5a059', fontWeight: 700, marginBottom: 4 }}>
-                      💡 THÔNG TIN THẺ TEST MOMO SANDBOX (Nhập đúng để không bị từ chối):
+                      💡 THÔNG TIN THẺ TEST MOMO SANDBOX (Nhập đúng để thanh toán thành công):
                     </div>
-                    <div>• Số thẻ ATM nội địa: <strong style={{ color: '#fff', userSelect: 'all' }}>9704000000000018</strong> (viết liền)</div>
+                    <div>• Số thẻ: <strong style={{ color: '#fff', userSelect: 'all' }}>4111111111111111</strong> (hoặc <strong style={{ color: '#fff', userSelect: 'all' }}>5200000000001096</strong>)</div>
+                    <div>• Ngày hết hạn (MM/YY): <strong style={{ color: '#fff', userSelect: 'all' }}>05/26</strong></div>
                     <div>• Tên chủ thẻ: <strong style={{ color: '#fff', userSelect: 'all' }}>NGUYEN VAN A</strong></div>
-                    <div>• Ngày phát hành (MM/YY): <strong style={{ color: '#fff', userSelect: 'all' }}>03/07</strong></div>
-                    <div>• Mã xác thực OTP: Nhập chữ <strong style={{ color: '#2ecc71', userSelect: 'all' }}>OTP</strong> (viết hoa)</div>
+                    <div>• Số CVC: <strong style={{ color: '#2ecc71', userSelect: 'all' }}>111</strong> | Số điện thoại: <strong style={{ color: '#fff', userSelect: 'all' }}>0901234567</strong></div>
                   </div>
                 )}
               </div>
