@@ -59,6 +59,8 @@ services:
     restart: always
     environment:
       - DB_HOST=mysql
+      - BOOKING_SERVICE_URL=http://booking-service:3003
+      - USER_SERVICE_URL=http://user-service:3001
     depends_on:
       mysql:
         condition: service_healthy
@@ -76,7 +78,6 @@ services:
       - ROOM_SERVICE_URL=http://room-service:3002
       - BOOKING_SERVICE_URL=http://booking-service:3003
       - PAYMENT_SERVICE_URL=http://payment-service:3004
-      # - GEMINI_API_KEY=your_key_here
     depends_on:
       mysql:
         condition: service_healthy

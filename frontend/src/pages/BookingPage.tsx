@@ -80,7 +80,7 @@ const BookingPage: React.FC = () => {
         bookingId: booking.id,
         userId: user.id,
         amount: finalTotal,
-        method: paymentMethod as any,
+        method: paymentMethod.startsWith('MOMO') ? 'MOMO' : (paymentMethod as any),
       });
 
       if (paymentMethod.startsWith('MOMO') && paymentRes.momoUrl) {

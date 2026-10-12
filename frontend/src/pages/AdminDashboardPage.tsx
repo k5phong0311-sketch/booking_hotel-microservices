@@ -7,7 +7,7 @@ import { bookingService } from '../services/booking.service';
 import { userService } from '../services/user.service';
 import { Room, Booking, User } from '../types';
 
-const revenueData = [
+const initialRevenueData = [
   { name: 'Mon', revenue: 4000000 },
   { name: 'Tue', revenue: 3000000 },
   { name: 'Wed', revenue: 5000000 },
@@ -23,7 +23,7 @@ const AdminDashboardPage: React.FC = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-  const [revenueData, setRevenueData] = useState<{name: string, revenue: number}[]>([]);
+  const [revenueData] = useState<{name: string, revenue: number}[]>(initialRevenueData);
 
   // Room Management State
   const [showRoomModal, setShowRoomModal] = useState(false);
@@ -82,7 +82,7 @@ const AdminDashboardPage: React.FC = () => {
 
   const handleBroadcastVoucher = (e: React.FormEvent) => {
     e.preventDefault();
-    setStatusMsg(`__ISSUED_VOUCHER__ ${voucherCode} (-${voucherValue}%). __QUANTITY__: ${quantity}`);
+    setStatusMsg(`Đã phát hành mã ${voucherCode} (-${voucherValue}%). Số lượng: ${quantity}`);
   };
 
   const handleSendReply = (e: React.FormEvent) => {
@@ -105,7 +105,7 @@ const AdminDashboardPage: React.FC = () => {
       setEditingRoom({});
       fetchData();
     } catch (err) {
-      alert('__ERROR__');
+      alert('Đã xảy ra lỗi khi lưu phòng');
     }
   };
 
@@ -131,7 +131,7 @@ const AdminDashboardPage: React.FC = () => {
   };
 
   const handleDeleteRoom = async (id: number) => {
-    if (confirm('__CONFIRM_DELETE__')) {
+    if (confirm('Bạn có chắc chắn muốn xóa phòng này?')) {
       await roomService.deleteRoom(id);
       fetchData();
     }
@@ -201,18 +201,18 @@ const AdminDashboardPage: React.FC = () => {
       {activeTab === 'rooms' && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-gray-900">__ROOM_LIST__</h2>
-            <button onClick={() => { setEditingRoom({}); setShowRoomModal(true); }} className="bg-brand-DEFAULT text-white px-4 py-2 rounded-lg font-bold text-sm">+ __ADD_ROOM__</button>
+            <h2 className="text-xl font-bold text-gray-900">Danh sách phòng</h2>
+            <button onClick={() => { setEditingRoom({}); setShowRoomModal(true); }} className="bg-brand-DEFAULT text-white px-4 py-2 rounded-lg font-bold text-sm">+ Thêm phòng</button>
           </div>
           <div className="overflow-x-auto"><table className="w-full text-left whitespace-nowrap">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 font-bold text-gray-900">__IMAGE__</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Hình ảnh</th>
                 <th className="px-6 py-4 font-bold text-gray-900">Tên phòng</th>
                 <th className="px-6 py-4 font-bold text-gray-900">Loại</th>
                 <th className="px-6 py-4 font-bold text-gray-900">Giá/Ngày</th>
                 <th className="px-6 py-4 font-bold text-gray-900">Trạng thái</th>
-                <th className="px-6 py-4 font-bold text-gray-900">__ACTIONS__</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Hành động</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -224,7 +224,7 @@ const AdminDashboardPage: React.FC = () => {
                   <td className="px-6 py-4 text-brand-DEFAULT font-bold">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(room.pricePerNight)}</td>
                   <td className="px-6 py-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold ${room.isAvailable ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                      {room.isAvailable ? '__AVAILABLE__' : '__BOOKED__'}
+                      {room.isAvailable ? 'Còn trống' : 'Đã đặt'}
                     </span>
                   </td>
                   <td className="px-6 py-4 flex space-x-2">
@@ -241,7 +241,7 @@ const AdminDashboardPage: React.FC = () => {
       {showRoomModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-2xl w-full p-8">
-            <h2 className="text-2xl font-bold mb-6">{editingRoom.id ? '__UPDATE_ROOM__' : '__ADD_ROOM__'}</h2>
+            <h2 className="text-2xl font-bold mb-6">{editingRoom.id ? 'Cập nhật phòng' : 'Thêm phòng mới'}</h2>
             <form onSubmit={handleSaveRoom} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -258,7 +258,7 @@ const AdminDashboardPage: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold mb-1">__PRICE_PER_NIGHT__</label>
+                  <label className="block text-sm font-bold mb-1">Giá mỗi đêm (VNĐ)</label>
                   <input type="number" required className="w-full border p-2 rounded-lg" value={editingRoom.pricePerNight || ''} onChange={e => setEditingRoom({...editingRoom, pricePerNight: Number(e.target.value)})} />
                 </div>
                 <div>

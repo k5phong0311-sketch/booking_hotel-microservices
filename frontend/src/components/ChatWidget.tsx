@@ -3,7 +3,7 @@ import { io, Socket } from 'socket.io-client';
 
 interface ChatMessage {
   id: string;
-  sender: 'user' | 'ai' | 'human' | 'system';
+  sender: 'user' | 'human' | 'system';
   text: string;
   time: Date;
 }
@@ -12,7 +12,6 @@ const ChatWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
-  const [requiresHuman, setRequiresHuman] = useState(false);
   const [adminOnline, setAdminOnline] = useState(false);
   const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -32,25 +31,15 @@ const ChatWidget: React.FC = () => {
 
     socketRef.current.on('adminStatus', (data: { isOnline: boolean }) => {
       setAdminOnline(data.isOnline);
-      if (!data.isOnline && requiresHuman) {
-        setMessages(prev => [...prev, {
-          id: Date.now().toString(),
-          sender: 'system',
-          text: 'Tư vấn viên vừa offline. Trợ lý AI sẽ tiếp tục hỗ trợ bạn.',
-          time: new Date()
-        }]);
-        setRequiresHuman(false);
-      }
     });
 
     socketRef.current.on('aiReply', (data: { message: string, timestamp: string, isError?: boolean }) => {
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
-        sender: data.isError ? 'system' : 'ai',
+        sender: 'system',
         text: data.message,
         time: new Date(data.timestamp)
       }]);
-      if (data.isError) setRequiresHuman(false);
     });
 
     socketRef.current.on('humanReply', (data: { message: string, timestamp: string }) => {
@@ -64,8 +53,8 @@ const ChatWidget: React.FC = () => {
 
     setMessages([{ 
       id: 'welcome', 
-      sender: 'ai', 
-      text: 'Xin chào! Tôi là Lễ tân ảo của BOOKINGHOTEL. Tôi có thể giúp gì cho bạn hôm nay?', 
+      sender: 'human', 
+      text: 'Xin chào! Bộ phận CSKH của BOOKINGHOTEL có thể hỗ trợ gì cho bạn hôm nay?', 
       time: new Date() 
     }]);
 
@@ -85,23 +74,8 @@ const ChatWidget: React.FC = () => {
     if (!input.trim()) return;
 
     setMessages(prev => [...prev, { id: Date.now().toString(), sender: 'user', text: input, time: new Date() }]);
-    socketRef.current?.emit('userMessage', { message: input, requiresHuman });
+    socketRef.current?.emit('userMessage', { message: input });
     setInput('');
-  };
-
-  const toggleHuman = () => {
-    if (!adminOnline) {
-      alert('Hiện tại không có nhân viên CSKH nào online!');
-      return;
-    }
-    const newVal = !requiresHuman;
-    setRequiresHuman(newVal);
-    setMessages(prev => [...prev, {
-      id: Date.now().toString(),
-      sender: 'system',
-      text: newVal ? 'Đã chuyển sang chế độ Chat với Nhân viên CSKH. Vui lòng đặt câu hỏi.' : 'Đã quay lại chế độ Chat với Trợ lý AI.',
-      time: new Date()
-    }]);
   };
 
   return (
@@ -116,13 +90,10 @@ const ChatWidget: React.FC = () => {
             <div>
               <h3 className="font-bold text-lg leading-tight">BOOKINGHOTEL</h3>
               <p className="text-xs opacity-80 flex items-center gap-1">
-                <span className={`w-2 h-2 rounded-full ${requiresHuman ? 'bg-orange-400' : 'bg-green-400'}`}></span>
-                {requiresHuman ? 'Nhân viên CSKH' : 'Trợ lý AI'}
+                <span className={`w-2 h-2 rounded-full ${adminOnline ? 'bg-green-400' : 'bg-gray-400'}`}></span>
+                {adminOnline ? 'Nhân viên CSKH (Trực tuyến)' : 'Nhân viên CSKH (Tạm vắng)'}
               </p>
             </div>
-            <button onClick={toggleHuman} className={`text-xs px-2 py-1 rounded border ${requiresHuman ? 'bg-white text-brand-dark' : 'border-white/50 hover:bg-white/10'}`}>
-              {requiresHuman ? '🤖 Gặp AI' : '👤 Gặp Lễ tân'}
-            </button>
           </div>
 
           <div className="flex-1 p-4 overflow-y-auto bg-gray-50 flex flex-col gap-3">
@@ -132,8 +103,8 @@ const ChatWidget: React.FC = () => {
                   <div className="text-xs text-gray-400 italic text-center w-full my-2">{msg.text}</div>
                 ) : (
                   <>
-                  <span className="text-[10px] text-gray-400 mb-1 ml-1">{msg.sender === 'user' ? 'Bạn' : msg.sender === 'ai' ? 'AI' : 'CSKH'}</span>
-                  <div className={`px-3 py-2 rounded-xl text-sm ${msg.sender === 'user' ? 'bg-brand-DEFAULT text-white rounded-tr-none' : msg.sender === 'human' ? 'bg-orange-100 text-gray-900 rounded-tl-none border border-orange-200' : 'bg-white text-gray-900 rounded-tl-none border border-gray-200'}`}>
+                  <span className="text-[10px] text-gray-400 mb-1 ml-1">{msg.sender === 'user' ? 'Bạn' : 'CSKH'}</span>
+                  <div className={`px-3 py-2 rounded-xl text-sm ${msg.sender === 'user' ? 'bg-brand-DEFAULT text-white rounded-tr-none' : 'bg-white text-gray-900 rounded-tl-none border border-gray-200'}`}>
                     {msg.text}
                   </div>
                   </>
@@ -154,3 +125,4 @@ const ChatWidget: React.FC = () => {
 };
 
 export default ChatWidget;
+

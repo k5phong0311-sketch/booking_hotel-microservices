@@ -3,7 +3,7 @@
 ![Banner](https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80)
 
 <p align="center">
-  <strong>Hệ thống đặt phòng khách sạn theo kiến trúc Microservices hiện đại, tin cậy và mở rộng linh hoạt.</strong>
+  <strong>Xây dựng hệ thống đặt phòng khách sạn BookingHotel theo kiến trúc Microservices</strong>
 </p>
 
 <p align="center">
@@ -13,16 +13,15 @@
   <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="TailwindCSS" />
   <img src="https://img.shields.io/badge/MySQL_8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL" />
   <img src="https://img.shields.io/badge/Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
-  <img src="https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socketdotio&logoColor=white" alt="Socket.io" />
 </p>
 
 ---
 
 ## 📖 Giới thiệu tổng quan
 
-**BOOKINGHOTEL** là hệ thống đặt phòng khách sạn trực tuyến được thiết kế và triển khai hoàn toàn theo kiến trúc **Microservices**. Hệ thống kết hợp sức mạnh của **NestJS** ở phía Backend và **React + TypeScript (Vite, Tailwind CSS)** ở phía Frontend.
+**BookingHotel** là hệ thống đặt phòng khách sạn trực tuyến được xây dựng theo kiến trúc **Microservices**, bao gồm các phân hệ chính: **API Gateway (Integration & Review)**, **User & Auth**, **Room Catalog**, **Booking** và **Payment & Notification**.
 
-Dự án mô phỏng toàn diện quy trình vận hành thực tế của một nền tảng đặt phòng nghỉ dưỡng: từ tìm kiếm phòng, đặt chỗ, áp dụng mã ưu đãi (Voucher), tích hợp cổng thanh toán trực tuyến **MoMo Sandbox** (hỗ trợ thanh toán lại), cấp **Thẻ phòng điện tử (QR Code Check-in)**, cho đến kênh **Live Chat Chăm sóc khách hàng (CSKH) Realtime** kết hợp trợ lý AI thông minh (**Google Gemini AI**) tự động phản hồi khi nhân viên vắng mặt.
+Hệ thống cho phép người dùng đăng ký, đăng nhập, xem danh sách phòng, đặt phòng theo ngày, thanh toán (giả lập qua MoMo Sandbox / tại quầy) và quản lý lịch sử đặt phòng. Backend sử dụng **NestJS (TypeScript)**, Frontend dùng **React**, cơ sở dữ liệu **MySQL** với mô hình **Database-per-Service**, giao tiếp giữa các service qua **REST API**.
 
 ---
 
@@ -32,7 +31,7 @@ Dự án mô phỏng toàn diện quy trình vận hành thực tế của một
 2. [🛠 Công nghệ sử dụng](#-công-nghệ-sử-dụng)
 3. [🏗 Kiến trúc hệ thống & Danh sách Microservices](#-kiến-trúc-hệ-thống--danh-sách-microservices)
 4. [🔄 Luồng nghiệp vụ chính](#-luồng-nghiệp-vụ-chính)
-5. [👥 Phân công công việc](#-phân-công-công-việc)
+5. [👥 Phân công công việc (Nhóm 10)](#-phân-công-công-việc-nhóm-10)
 6. [📁 Cấu trúc thư mục](#-cấu-trúc-thư-mục)
 7. [🚀 Cài đặt & Khởi chạy dự án](#-cài-đặt--khởi-chạy-dự-án)
 8. [⚙️ Cấu hình biến môi trường](#️-cấu-hình-biến-môi-trường)
@@ -46,25 +45,21 @@ Dự án mô phỏng toàn diện quy trình vận hành thực tế của một
 ## ✨ Tính năng nổi bật
 
 ### 1. Dành cho Khách hàng (Customer Web Portal)
-- 🔍 **Tìm kiếm & Lọc phòng thông minh:** Xem danh sách phòng trực quan, lọc theo loại phòng (Standard, Deluxe, Suite,...), khoảng giá và trạng thái phòng trống.
-- 📝 **Quy trình đặt phòng chuẩn hoá:** Đặt phòng nhanh chóng với biểu mẫu xác thực thông tin (họ tên, số điện thoại, địa chỉ nhận phòng, ghi chú).
-- 🏷️ **Áp dụng Mã giảm giá (Voucher):** Nhập voucher khuyến mãi, hệ thống tự động kiểm tra tính hợp lệ và chiết khấu trực tiếp vào tổng tiền.
-- 💳 **Cổng thanh toán đa dạng & MoMo Sandbox:**
-  - Hỗ trợ thanh toán quét mã QR qua cổng MoMo Sandbox.
-  - Tích hợp trang kết quả thanh toán Callback, cập nhật trạng thái đơn tức thì.
-  - Hỗ trợ nút **Thanh toán lại** trực tiếp từ trang *Lịch sử đặt phòng* nếu giao dịch trước đó chưa hoàn tất hoặc gặp sự cố.
-- 📱 **Thẻ phòng điện tử (QR Code Check-in):** Khách hàng nhận ngay Thẻ phòng điện tử chứa mã QR sau khi thanh toán thành công để xuất trình check-in nhanh tại quầy lễ tân.
-- 💬 **Live Chat CSKH Realtime & Gemini AI Fallback:**
-  - Nhắn tin trực tiếp với nhân viên hỗ trợ khách sạn qua WebSocket trong thời gian thực.
-  - Tự động kích hoạt Chatbot **Google Gemini AI** thông minh làm lễ tân ảo tư vấn giá phòng, tiện ích và giải đáp thắc mắc khi nhân viên bận.
-- ⭐ **Đánh giá & Phản hồi (Reviews):** Gửi đánh giá sao và bình luận trải nghiệm cho từng phòng nghỉ.
+- 🔍 **Tìm kiếm & Xem danh sách phòng:** Xem danh sách phòng trực quan, lọc theo loại phòng (`SINGLE`, `DOUBLE`, `DELUXE`, `SUITE`), khoảng giá và trạng thái phòng trống.
+- 📝 **Đặt phòng theo ngày:** Đặt phòng nhanh chóng theo ngày nhận - trả phòng, tự động tính số đêm lưu trú và tổng chi phí.
+- 🏷️ **Áp dụng Mã giảm giá (Voucher):** Nhập mã khuyến mãi để kiểm tra tính hợp lệ và chiết khấu trực tiếp vào tổng tiền thanh toán.
+- 💳 **Thanh toán giả lập (MoMo Sandbox / Tiền mặt):**
+  - Hỗ trợ thanh toán giả lập qua cổng MoMo Sandbox hoặc đặt trước thanh toán tại quầy.
+  - Tích hợp trang kết quả thanh toán Callback, tự động cập nhật trạng thái đơn đặt phòng.
+  - Hỗ trợ **Thanh toán lại** trực tiếp từ trang *Lịch sử đặt phòng* nếu đơn đang ở trạng thái chờ (`PENDING`).
+- 📱 **Quản lý lịch sử đặt phòng & Thẻ phòng điện tử (QR Code):** Theo dõi trạng thái đơn đặt phòng, hủy đơn và nhận mã QR Check-in điện tử sau khi đơn được xác nhận (`CONFIRMED`).
+- ⭐ **Đánh giá & Phản hồi (Review Service):** Gửi đánh giá sao và nhận xét trải nghiệm cho từng phòng nghỉ.
 
 ### 2. Dành cho Quản trị viên (Admin Dashboard)
-- 📊 **Thống kê doanh thu & Tổng quan (Overview):** Biểu đồ doanh thu thực tế, tổng số đơn đặt phòng, tỷ lệ phòng đã lấp đầy thông qua thư viện biểu đồ Recharts.
-- 👥 **Quản lý Người dùng (User Management CRUD):** Xem danh sách tài khoản, cập nhật thông tin, thay đổi phân quyền (Admin / Customer) và xóa tài khoản.
-- 🏨 **Quản lý Danh mục phòng (Room Catalog CRUD):** Thêm phòng mới, cập nhật giá niêm yết, sửa thông tin mô tả, bật/tắt trạng thái phòng khả dụng.
-- 📋 **Quản lý Đơn đặt phòng (Booking Management):** Theo dõi danh sách booking toàn hệ thống, phê duyệt đơn, hủy đơn và cập nhật trạng thái thanh toán.
-- 🎧 **Trung tâm CSKH Trực tuyến (Admin Live Chat Center):** Tiếp nhận danh sách khách hàng đang nhắn tin, trả lời tin nhắn thời gian thực qua WebSocket.
+- 📊 **Thống kê doanh thu & Tổng quan (Overview):** Biểu đồ doanh thu theo ngày và phát hành chiến dịch mã giảm giá (Voucher).
+- 👥 **Quản lý Người dùng (User & Auth):** Xem danh sách tài khoản, cập nhật thông tin và quản lý phân quyền (`ADMIN` / `CUSTOMER`).
+- 🏨 **Quản lý Danh mục phòng (Room Catalog):** Thêm phòng mới, cập nhật giá phòng, mô tả, hình ảnh và trạng thái phòng trống.
+- 📋 **Quản lý Đơn đặt phòng (Booking Management):** Theo dõi toàn bộ danh sách đặt phòng, xác nhận đơn (`CONFIRMED`) hoặc hủy đơn (`CANCELLED`).
 
 ---
 
@@ -72,17 +67,15 @@ Dự án mô phỏng toàn diện quy trình vận hành thực tế của một
 
 | Phân hệ | Công nghệ | Chi tiết |
 |:---|:---|:---|
-| **Frontend** | React 18, TypeScript, Vite | UI component hiện đại, SPA hiệu năng cao |
-| **Styling** | Tailwind CSS, Lucide React | Giao diện Responsive, icons trực quan |
-| **Visualization** | Recharts | Vẽ biểu đồ thống kê doanh thu và báo cáo |
-| **Backend** | NestJS 10, TypeScript | Kiến trúc module, Dependency Injection |
-| **ORM** | TypeORM | Tương tác cơ sở dữ liệu quan hệ an toàn, tự động đồng bộ schema |
-| **Database** | MySQL 8.0 | Mô hình Database-per-service (5 cơ sở dữ liệu riêng biệt) |
-| **Xác thực** | JWT (JSON Web Token), Bcrypt | Stateless authentication, bảo mật mật khẩu |
-| **Giao tiếp Realtime** | Socket.io, WebSockets | Kênh chat thời gian thực giữa Client và Admin |
-| **Trí tuệ nhân tạo** | Google Gemini API (`gemini-1.5-flash`) | AI Fallback tự động trả lời khách hàng |
-| **Cổng thanh toán** | MoMo Payment API (Sandbox) | Thanh toán trực tuyến quét mã QR |
-| **Điều phối & Đóng gói**| Docker, Docker Compose | Chuẩn hoá môi trường chạy từ dev đến deployment |
+| **Frontend** | React 18, TypeScript, Vite | Giao diện SPA hiện đại, tốc độ phản hồi nhanh |
+| **Styling & UI** | Tailwind CSS, Recharts | Giao diện Responsive, biểu đồ thống kê doanh thu |
+| **Backend** | NestJS 10 (TypeScript) | Kiến trúc hướng module, Dependency Injection |
+| **ORM** | TypeORM | Tương tác cơ sở dữ liệu quan hệ, tự động đồng bộ schema |
+| **Database** | MySQL 8.0 | Mô hình **Database-per-Service** (5 cơ sở dữ liệu độc lập) |
+| **Giao tiếp nội bộ** | REST API (HTTP / Axios) | Giao tiếp đồng bộ giữa API Gateway và các Microservices |
+| **Xác thực** | JWT (JSON Web Token), Bcrypt | Stateless Authentication, mã hóa mật khẩu an toàn |
+| **Thanh toán** | MoMo Payment (Giả lập / Sandbox) | Xử lý giao dịch thanh toán và IPN/Callback |
+| **Đóng gói & Triển khai** | Docker, Docker Compose | Đóng gói và khởi chạy đồng bộ toàn bộ hệ thống |
 
 ---
 
@@ -92,106 +85,89 @@ Dự án mô phỏng toàn diện quy trình vận hành thực tế của một
 
 ```mermaid
 flowchart TD
-    Client["Client Web App (React + Vite :5173)"]
-    Gateway["API Gateway (:3000)\n- Routing & Reverse Proxy\n- JWT Authentication Guard\n- Review Service\n- WebSocket Chat Server + Gemini AI Fallback"]
+    Client["Frontend React App (:5173)"]
+    Gateway["API Gateway, Integration & Review Service (:3000)\n- Reverse Proxy & Routing\n- JWT Authentication Guard\n- Review Module"]
 
-    subgraph Internal_Microservices ["Internal Microservices Layer"]
+    subgraph Microservices ["Backend Microservices (NestJS)"]
         UserSvc["User & Auth Service (:3001)"]
         RoomSvc["Room Catalog Service (:3002)"]
         BookingSvc["Booking Service (:3003)"]
         PaymentSvc["Payment & Notification Service (:3004)"]
     end
 
-    subgraph Database_Cluster ["MySQL Database Cluster (:3307)"]
+    subgraph Databases ["MySQL Database-per-Service (:3307)"]
+        DB_Gateway[("gateway_db")]
         DB_User[("user_db")]
         DB_Room[("room_db")]
         DB_Booking[("booking_db")]
         DB_Payment[("payment_db")]
-        DB_Gateway[("gateway_db")]
     end
 
-    Client -->|HTTP / REST API| Gateway
-    Client <-->|WebSocket Realtime Chat| Gateway
+    Client -->|REST API| Gateway
 
-    Gateway -->|Proxy /auth, /users| UserSvc
-    Gateway -->|Proxy /rooms| RoomSvc
-    Gateway -->|Proxy /bookings| BookingSvc
-    Gateway -->|Proxy /payments, /vouchers| PaymentSvc
+    Gateway -->|REST API /auth, /users| UserSvc
+    Gateway -->|REST API /rooms| RoomSvc
+    Gateway -->|REST API /bookings| BookingSvc
+    Gateway -->|REST API /payments, /vouchers| PaymentSvc
 
-    BookingSvc -->|Check availability| RoomSvc
-    BookingSvc -->|Init payment| PaymentSvc
-    PaymentSvc -->|Update booking status| BookingSvc
-    PaymentSvc -->|MoMo API Sandbox| MoMoGateway["MoMo Payment Gateway"]
+    BookingSvc -->|REST: Check availability| RoomSvc
+    BookingSvc -->|REST: Init payment| PaymentSvc
+    PaymentSvc -->|REST: Update booking status| BookingSvc
 
+    Gateway --> DB_Gateway
     UserSvc --> DB_User
     RoomSvc --> DB_Room
     BookingSvc --> DB_Booking
     PaymentSvc --> DB_Payment
-    Gateway --> DB_Gateway
 ```
 
 ### Danh sách các Microservices
 
 | Service | Port | Database | Nhiệm vụ chính |
 |:---|:---:|:---:|:---|
-| **API Gateway & Chat Service** | `3000` | `gateway_db` | Điểm tiếp nhận request duy nhất của hệ thống, định tuyến (proxy) tới các service nội bộ, kiểm tra JWT, quản lý đánh giá Review và cổng WebSocket Live Chat hỗ trợ Gemini AI. |
-| **User & Auth Service** | `3001` | `user_db` | Đăng ký tài khoản, đăng nhập, cấp JWT Token, mã hóa mật khẩu, API quản lý và phân quyền người dùng (Admin / Customer). |
-| **Room Catalog Service** | `3002` | `room_db` | Quản lý danh mục phòng, lọc theo loại phòng/giá tiền, kiểm tra trạng thái phòng trống (`availability`) phục vụ đơn đặt phòng. |
-| **Booking Service** | `3003` | `booking_db` | Xử lý nghiệp vụ đặt phòng, quản lý trạng thái vòng đời của đơn đặt (`PENDING` ➔ `CONFIRMED` / `FAILED` / `CANCELLED`), kiểm tra phòng trống qua Room Service. |
-| **Payment & Notification Service** | `3004` | `payment_db` | Tích hợp cổng thanh toán MoMo Sandbox, kiểm tra và khấu trừ Voucher giảm giá, cập nhật trạng thái đơn về Booking Service và gửi thông báo xác nhận. |
-| **Frontend Web Client** | `5173` | N/A | Ứng dụng giao diện người dùng dành cho Khách hàng và Bảng điều khiển Quản trị viên (Admin Dashboard). |
-
-> **Nguyên tắc thiết kế cốt lõi:** Áp dụng mẫu kiến trúc **Database-per-service**; mỗi microservice độc lập quản lý cơ sở dữ liệu của riêng mình nhằm đảm bảo tính toàn vẹn và loose coupling.
+| **API Gateway, Integration & Review Service** | `3000` | `gateway_db` | Cổng giao tiếp trung tâm tiếp nhận request từ Frontend, định tuyến (Reverse Proxy) tới các service nội bộ qua REST API, xác thực JWT và quản lý đánh giá phòng (Review Service). |
+| **User & Auth Service** | `3001` | `user_db` | Đăng ký, đăng nhập, cấp phát JWT Token, mã hóa mật khẩu Bcrypt, quản lý thông tin hồ sơ và phân quyền người dùng (`ADMIN` / `CUSTOMER`). |
+| **Room Catalog Service** | `3002` | `room_db` | Quản lý danh sách phòng khách sạn, lọc phòng theo loại phòng và mức giá, kiểm tra tình trạng phòng trống (`availability`) phục vụ đặt phòng. |
+| **Booking Service** | `3003` | `booking_db` | Lõi xử lý nghiệp vụ đặt phòng theo ngày, tính toán chi phí, kiểm tra phòng trống qua Room Service và quản lý vòng đời trạng thái đơn đặt (`PENDING` ➔ `CONFIRMED` / `FAILED` / `CANCELLED`). |
+| **Payment & Notification Service** | `3004` | `payment_db` | Xử lý thanh toán (giả lập / MoMo Sandbox), quản lý mã giảm giá (Voucher), đồng bộ trạng thái thanh toán về Booking Service và gửi thông báo xác nhận. |
+| **Frontend Web Client** | `5173` | N/A | Giao diện người dùng React cho Khách hàng đặt phòng và Bảng điều khiển Quản trị viên (Admin Dashboard). |
 
 ---
 
 ## 🔄 Luồng nghiệp vụ chính
 
-### 1. Luồng Đặt phòng & Thanh toán MoMo
+### 1. Luồng Đặt phòng & Thanh toán (Booking & Payment Flow)
 ```
-1. Khách hàng chọn phòng & thời gian lưu trú trên Frontend
-2. Frontend gửi yêu cầu tạo booking: POST /api/bookings
-3. API Gateway kiểm tra JWT Token và chuyển tiếp request đến Booking Service
-4. Booking Service gọi Room Service: GET /rooms/:id/availability để kiểm tra phòng
-5. Nếu phòng trống:
-   - Booking Service tạo đơn với trạng thái: PENDING
-   - Frontend gửi yêu cầu thanh toán: POST /api/payments (chọn phương thức MOMO)
-   - Payment Service khởi tạo giao dịch qua MoMo API Sandbox và trả về link thanh toán (payUrl)
-6. Khách hàng quét mã MoMo hoặc hoàn tất thanh toán
-7. MoMo Callback / IPN gửi kết quả về Payment Service
-8. Payment Service cập nhật trạng thái sang SUCCESS và gọi Booking Service cập nhật CONFIRMED
-9. Frontend hiển thị Thẻ phòng điện tử (QR Code Check-in)
+1. Người dùng xem danh sách phòng, chọn ngày nhận phòng (Check-in) và trả phòng (Check-out)
+2. Frontend gửi request: POST /api/bookings qua API Gateway
+3. API Gateway xác thực JWT và chuyển tiếp tới Booking Service
+4. Booking Service gọi REST API sang Room Catalog Service: GET /rooms/:id/availability để kiểm tra phòng trống
+5. Nếu phòng hợp lệ, Booking Service lưu đơn đặt phòng mới với trạng thái PENDING
+6. Người dùng thực hiện thanh toán qua Payment & Notification Service (POST /api/payments)
+7. Sau khi thanh toán hoàn tất, Payment Service gọi REST API cập nhật trạng thái đơn bên Booking Service thành CONFIRMED và tạo thông báo xác nhận
 ```
 
-### 2. Luồng Đăng nhập & Xác thực (JWT Auth)
+### 2. Luồng Đăng ký & Đăng nhập (User & Auth Flow)
 ```
-1. Khách hàng / Admin gửi: POST /api/auth/login (email + password)
-2. API Gateway chuyển tiếp đến User & Auth Service
-3. User Service xác thực mật khẩu bcrypt và sinh chuỗi JWT Access Token chứa userId, role
-4. Client nhận và lưu JWT vào LocalStorage
-5. Các request kế tiếp gắn kèm header: Authorization: Bearer <jwt_token>
-```
-
-### 3. Luồng Live Chat CSKH & Trợ lý Gemini AI
-```
-1. Khách hàng mở widget chat trên website, kết nối WebSocket tới API Gateway
-2. Nếu Admin đang trực tuyến: Tin nhắn gửi trực tiếp tới Admin Dashboard Realtime
-3. Nếu Admin vắng mặt hoặc không phản hồi kịp thời:
-   - Hệ thống tự động kích hoạt ChatService với Google Gemini AI
-   - AI đóng vai trò lễ tân ảo giải đáp thông tin phòng, giá cả và hướng dẫn đặt phòng
+1. Người dùng gửi thông tin đăng ký (POST /api/auth/register) hoặc đăng nhập (POST /api/auth/login)
+2. API Gateway chuyển tiếp request đến User & Auth Service
+3. User & Auth Service kiểm tra thông tin, đối chiếu mật khẩu đã băm (Bcrypt) và trả về chuỗi JWT Access Token
+4. Frontend lưu trữ JWT và đính kèm vào Header (Authorization: Bearer <token>) cho các tác vụ đặt phòng, thanh toán và quản lý lịch sử
 ```
 
 ---
 
-## 👥 Phân công công việc
+## 👥 Phân công công việc (Nhóm 10)
 
-| Họ và tên | Email | Service phụ trách & Đóng góp chính | Branch |
-|:---|:---|:---|:---|
-| **Trương Văn Phong** | k5phong0311@gmail.com | **API Gateway, Chat & Review Service:** Xây dựng cổng Gateway định tuyến, thiết lập WebSocket Server cho luồng tin nhắn Realtime giữa Admin và Khách hàng, tích hợp Google Gemini AI Fallback, xây dựng module Review phòng. | `feat/api-gateway` |
-| **Trần Đức Hải** | 2311060742@hunre.edu.vn | **User & Auth Service:** Thiết kế xác thực JWT, bảo mật đăng nhập/đăng ký, xây dựng toàn bộ API CRUD người dùng và phân quyền (Admin / Customer) phục vụ quản trị. | `feat/user-auth` |
-| **Nguyễn Thành Hưng** | 2311060608@hunre.edu.vn | **Room Catalog Service:** Quản lý danh mục phòng, bộ lọc tìm kiếm theo giá và loại phòng, kiểm tra trạng thái phòng trống. Xây dựng giao diện hiển thị **Thẻ phòng điện tử QR Code**. | `feat/room-catalog` |
-| **Bùi Đại Dương** | 2311060706@hunre.edu.vn | **Booking Service:** Quản lý toàn bộ vòng đời đơn đặt phòng (`PENDING`, `CONFIRMED`, `CANCELLED`). Phụ trách luồng giao diện **BookingPage**: nhập thông tin khách hàng, tích hợp mã giảm giá Voucher. | `feat/booking-service` |
-| **Đậu Ngọc Anh** | daungocanh90@gmail.com | **Payment & Notification Service:** Tích hợp quy trình thanh toán MoMo Sandbox, tính năng thanh toán lại trên MyBookings, quản lý Voucher. Thiết kế giao diện **Admin Dashboard** (biểu đồ doanh thu Recharts). | `feat/payment-notification` |
+Bảng phân công nhiệm vụ các thành viên **Nhóm 10** theo đúng từng phân hệ Microservices:
+
+| Nhóm | Họ và tên | Phân hệ phụ trách (Microservice) | Chi tiết công việc đảm nhiệm |
+|:---:|:---|:---|:---|
+| **10** | **Đậu Ngọc Anh** | **Payment & Notification Service (Thanh toán & Thông báo)** | Xây dựng dịch vụ xử lý thanh toán giả lập (MoMo Sandbox / Tiền mặt), xử lý callback cập nhật trạng thái đơn đặt phòng, quản lý mã giảm giá (Voucher) và module gửi thông báo (Notification). |
+| **10** | **Bùi Đại Dương** | **User & Auth Service (Đăng nhập & Người dùng)** | Xây dựng dịch vụ đăng ký, đăng nhập, xác thực và cấp phát JWT Token, mã hóa mật khẩu bằng Bcrypt, các API quản lý thông tin tài khoản và phân quyền người dùng (`ADMIN` / `CUSTOMER`). |
+| **10** | **Trần Đức Hải** | **Booking Service (Lõi Đặt phòng)** | Xây dựng dịch vụ lõi đặt phòng theo ngày, tính toán chi phí lưu trú, giao tiếp REST API với Room Service để kiểm tra phòng trống, quản lý lịch sử đặt phòng và trạng thái đơn (`PENDING`, `CONFIRMED`, `CANCELLED`). |
+| **10** | **Nguyễn Thành Hưng** | **Room Catalog Service (Quản lý Phòng)** | Xây dựng dịch vụ quản lý danh mục phòng khách sạn (CRUD phòng), bộ lọc tìm kiếm theo loại phòng và khoảng giá, API kiểm tra và chuyển đổi trạng thái phòng khả dụng (`availability`). |
+| **10** | **Trương Văn Phong** | **API Gateway, Integration & Review Service (Cổng giao tiếp & Đánh giá)** | Xây dựng cổng API Gateway định tuyến (Reverse Proxy) tích hợp toàn bộ các Microservices, cấu hình JWT Auth Guard tập trung, phát triển phân hệ đánh giá phòng (Review Service) và thiết lập Docker Compose. |
 
 ---
 
@@ -199,12 +175,12 @@ flowchart TD
 
 ```
 booking_hotel-microservices/
-├── api-gateway/                 # API Gateway, Review & Live Chat Service (Port: 3000)
+├── api-gateway/                 # API Gateway, Integration & Review Service (Port: 3000)
 │   ├── src/
-│   │   ├── auth/                # JWT Auth guard & strategy
-│   │   ├── chat/                # Socket.io Gateway & Gemini AI Service
-│   │   ├── proxy/               # Reverse Proxy định tuyến tới các service
-│   │   ├── review/              # Quản lý đánh giá phòng
+│   │   ├── auth/                # JWT Auth Guard xác thực tập trung
+│   │   ├── health/              # Kiểm tra trạng thái hoạt động của các services
+│   │   ├── proxy/               # Reverse Proxy định tuyến REST API tới các services
+│   │   ├── review/              # Quản lý đánh giá & nhận xét phòng (Review Service)
 │   │   ├── app.module.ts
 │   │   └── main.ts
 │   ├── .env.example
@@ -213,8 +189,8 @@ booking_hotel-microservices/
 │
 ├── user-service/                # User & Auth Service (Port: 3001)
 │   ├── src/
-│   │   ├── auth/                # Đăng ký, đăng nhập, JWT
-│   │   ├── users/               # Quản lý tài khoản & phân quyền
+│   │   ├── auth/                # Đăng ký, đăng nhập, cấp phát JWT
+│   │   ├── users/               # Quản lý thông tin người dùng & phân quyền
 │   │   └── main.ts
 │   ├── .env.example
 │   ├── Dockerfile
@@ -222,7 +198,7 @@ booking_hotel-microservices/
 │
 ├── room-service/                # Room Catalog Service (Port: 3002)
 │   ├── src/
-│   │   ├── rooms/               # CRUD phòng, tìm kiếm & kiểm tra phòng trống
+│   │   ├── rooms/               # CRUD phòng, lọc phòng & kiểm tra phòng trống
 │   │   └── main.ts
 │   ├── .env.example
 │   ├── Dockerfile
@@ -230,7 +206,7 @@ booking_hotel-microservices/
 │
 ├── booking-service/             # Booking Service (Port: 3003)
 │   ├── src/
-│   │   ├── bookings/            # Nghiệp vụ đặt phòng, quản lý trạng thái
+│   │   ├── bookings/            # Lõi đặt phòng theo ngày & quản lý lịch sử đặt phòng
 │   │   └── main.ts
 │   ├── .env.example
 │   ├── Dockerfile
@@ -238,27 +214,30 @@ booking_hotel-microservices/
 │
 ├── payment-service/             # Payment & Notification Service (Port: 3004)
 │   ├── src/
-│   │   ├── payments/            # Xử lý thanh toán & MoMo Sandbox API
+│   │   ├── payments/            # Thanh toán giả lập (MoMo Sandbox / Tiền mặt)
 │   │   ├── vouchers/            # Quản lý mã giảm giá
-│   │   ├── notifications/       # Gửi thông báo & email
+│   │   ├── notifications/       # Quản lý & gửi thông báo
 │   │   └── main.ts
 │   ├── .env.example
 │   ├── Dockerfile
 │   └── package.json
 │
-├── frontend/                    # Frontend React Web Client (Port: 5173)
+├── frontend/                    # Frontend React Application (Port: 5173)
 │   ├── src/
-│   │   ├── components/          # Navbar, ChatWidget, RoomCard, BookingSlideOver...
-│   │   ├── pages/               # HomePage, BookingPage, MyBookingsPage, AdminDashboard...
-│   │   ├── context/             # AuthContext, NotificationContext
-│   │   ├── services/            # Axios API clients
+│   │   ├── components/          # Navbar, RoomCard, BookingSlideOver, PrivateRoute...
+│   │   ├── pages/               # HomePage, RoomDetailPage, BookingPage, MyBookingsPage, AdminDashboardPage...
+│   │   ├── context/             # AuthContext
+│   │   ├── services/            # Axios REST API clients
 │   │   └── types/               # TypeScript interfaces
 │   ├── .env.example
 │   ├── Dockerfile
 │   └── package.json
 │
-├── docker-compose.yml           # Điều phối toàn bộ 7 containers
-├── init.sql                     # Khởi tạo 5 database MySQL
+├── docker-compose.yml           # Cấu hình khởi chạy toàn bộ hệ thống với Docker Compose
+├── init.sql                     # Khởi tạo 5 cơ sở dữ liệu MySQL (Database-per-Service)
+├── seed.sql                     # Dữ liệu phòng mẫu ban đầu
+├── start-docker.bat             # Script khởi chạy nhanh bằng Docker trên Windows
+├── start-all.bat                # Script khởi chạy môi trường dev cục bộ trên Windows
 └── README.md
 ```
 
@@ -268,68 +247,52 @@ booking_hotel-microservices/
 
 ### Yêu cầu môi trường
 - [Git](https://git-scm.com/)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (khuyến nghị chạy toàn bộ dự án)
-- [Node.js](https://nodejs.org/) >= 18 (nếu muốn chạy cục bộ từng service)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Khuyến nghị để chạy đồng bộ toàn bộ hệ thống)
+- [Node.js](https://nodejs.org/) >= 18 (Nếu chạy thủ công từng service trên máy)
 
 ---
 
 ### Cách 1: Khởi chạy bằng Docker Compose (Khuyến nghị)
-
-Chỉ với 1 câu lệnh, toàn bộ hệ thống gồm MySQL (5 databases), 5 backend NestJS services và Frontend React sẽ được build và khởi động tự động.
 
 ```bash
 # 1. Clone repository về máy
 git clone https://github.com/k5phong0311-sketch/booking_hotel-microservices.git
 cd booking_hotel-microservices
 
-# 2. Khởi chạy toàn bộ hệ thống
+# 2. Khởi chạy toàn bộ hệ thống (MySQL, 5 Backend Services và Frontend)
 docker-compose up --build -d
 
-# 3. Kiểm tra danh sách các containers đang hoạt động
+# 3. Kiểm tra trạng thái các containers
 docker ps
 ```
+*(Trên Windows có thể nhấp đúp trực tiếp vào file `start-docker.bat`)*
 
 Sau khi khởi chạy thành công:
-- 🌐 **Frontend Web:** [http://localhost:5173](http://localhost:5173)
+- 🌐 **Frontend React:** [http://localhost:5173](http://localhost:5173)
 - 🔀 **API Gateway:** [http://localhost:3000/api](http://localhost:3000/api)
-- 🗄️ **MySQL Database:** `localhost:3307` (User: `hotel_user`, Password: `hotel_password`)
+- 🗄️ **MySQL Database:** `localhost:3307` (User: `hotel_user` / Password: `hotel_password`)
 
 ---
 
-### Cách 2: Khởi chạy thủ công cho môi trường Phát triển (Local Development)
+### Cách 2: Khởi chạy thủ công cho môi trường Development
 
-#### Bước 1: Khởi động cơ sở dữ liệu MySQL bằng Docker
+#### Bước 1: Khởi động cơ sở dữ liệu MySQL
 ```bash
 docker-compose up -d mysql
 ```
-> Lệnh này sẽ tự động tạo 5 database: `gateway_db`, `user_db`, `room_db`, `booking_db`, `payment_db` dựa vào file [init.sql](file:///d:/Phong/booking_hotel-microservices/init.sql).
+> Tự động khởi tạo 5 database riêng biệt (`gateway_db`, `user_db`, `room_db`, `booking_db`, `payment_db`) thông qua file `init.sql`.
 
-#### Bước 2: Khởi chạy từng Microservice
-Tại mỗi thư mục service (`api-gateway`, `user-service`, `room-service`, `booking-service`, `payment-service`):
+#### Bước 2: Khởi chạy các Microservices và Frontend
+Trên Windows, bạn có thể chạy file `start-all.bat` hoặc khởi chạy từng thư mục (`api-gateway`, `user-service`, `room-service`, `booking-service`, `payment-service`, `frontend`):
 ```bash
-# Copy file môi trường mẫu
-cp .env.example .env
-
-# Cài đặt thư viện
-npm install
-
-# Khởi chạy ở chế độ dev (hot-reload)
-npm run start:dev
-```
-
-#### Bước 3: Khởi chạy Frontend React
-```bash
-cd frontend
 cp .env.example .env
 npm install
-npm run dev
+npm run start:dev   # (hoặc npm run dev đối với thư mục frontend)
 ```
 
 ---
 
 ## ⚙️ Cấu hình biến môi trường
-
-Mỗi microservice có file `.env.example` riêng biệt. Dưới đây là bảng tổng hợp các biến môi trường cấu hình:
 
 ### 1. API Gateway (`api-gateway/.env`)
 ```env
@@ -339,19 +302,14 @@ DB_PORT=3306
 DB_USERNAME=hotel_user
 DB_PASSWORD=hotel_password
 DB_NAME=gateway_db
-
 JWT_SECRET=super_secret_key_123
-
 USER_SERVICE_URL=http://localhost:3001
 ROOM_SERVICE_URL=http://localhost:3002
 BOOKING_SERVICE_URL=http://localhost:3003
 PAYMENT_SERVICE_URL=http://localhost:3004
-
-# Tuỳ chọn: Kích hoạt Gemini AI Chatbot
-GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
-### 2. User Service (`user-service/.env`)
+### 2. User & Auth Service (`user-service/.env`)
 ```env
 PORT=3001
 DB_HOST=localhost
@@ -363,7 +321,7 @@ JWT_SECRET=super_secret_key_123
 JWT_EXPIRES_IN=7d
 ```
 
-### 3. Room Service (`room-service/.env`)
+### 3. Room Catalog Service (`room-service/.env`)
 ```env
 PORT=3002
 DB_HOST=localhost
@@ -385,7 +343,7 @@ ROOM_SERVICE_URL=http://localhost:3002
 PAYMENT_SERVICE_URL=http://localhost:3004
 ```
 
-### 5. Payment Service (`payment-service/.env`)
+### 5. Payment & Notification Service (`payment-service/.env`)
 ```env
 PORT=3004
 DB_HOST=localhost
@@ -406,117 +364,94 @@ VITE_API_URL=http://localhost:3000/api
 
 ## 🛡️ Tài khoản dùng thử
 
-Hệ thống cung cấp sẵn các tài khoản mẫu để kiểm thử tính năng:
-
-| Vai trò | Email đăng nhập | Mật khẩu | Quyền hạn và Chức năng kiểm thử |
+| Vai trò | Email đăng nhập | Mật khẩu | Quyền hạn và Chức năng |
 |:---|:---|:---|:---|
-| **Quản trị viên (Admin)** | `admin@bookinghotel.com` | `admin123` | Truy cập Admin Dashboard, xem biểu đồ doanh thu, quản lý phòng, duyệt/hủy booking, quản lý user, trực tiếp chat CSKH với khách. |
-| **Khách hàng (Customer)** | `customer@bookinghotel.com` | `123456` | Tìm phòng, đặt phòng, nhập mã giảm giá, thanh toán MoMo Sandbox, xem mã QR thẻ phòng, chat với tư vấn viên/AI. |
+| **Quản trị viên (Admin)** | `admin@bookinghotel.com` | `admin123` | Truy cập Admin Dashboard, xem thống kê doanh thu, quản lý phòng, duyệt/hủy đơn đặt phòng và quản lý người dùng. |
+| **Khách hàng (Customer)** | `customer@bookinghotel.com` | `123456` | Xem danh sách phòng, đặt phòng theo ngày, áp dụng voucher, thanh toán giả lập, quản lý lịch sử đặt phòng và đánh giá phòng. |
 
 ---
 
 ## 📡 Tài liệu API Endpoints
 
-Tất cả các yêu cầu từ Frontend đều được gửi qua **API Gateway** tại địa chỉ: `http://localhost:3000/api`
+Mọi request từ Frontend đều đi qua **API Gateway** tại `http://localhost:3000/api`.
 
-> **Xác thực JWT:** Các endpoint yêu cầu quyền đăng nhập cần kèm theo header:
-> ```http
-> Authorization: Bearer <access_token>
-> ```
-
-### 1. Xác thực & Người dùng (`/api/auth`, `/api/users`)
-| Phương thức | Endpoint | Mô tả | Yêu cầu xác thực |
+### 1. User & Auth Service (`/api/auth`, `/api/users`)
+| Phương thức | Endpoint | Mô tả | Xác thực JWT |
 |:---|:---|:---|:---:|
-| `POST` | `/api/auth/register` | Đăng ký tài khoản khách hàng mới | ❌ |
-| `POST` | `/api/auth/login` | Đăng nhập tài khoản, trả về JWT Token | ❌ |
-| `GET` | `/api/users` | Lấy danh sách tất cả người dùng (Admin) | ✅ |
-| `GET` | `/api/users/:id` | Xem thông tin chi tiết một người dùng | ✅ |
-| `PATCH` | `/api/users/:id` | Cập nhật thông tin/phân quyền người dùng | ✅ |
-| `DELETE` | `/api/users/:id` | Xóa người dùng khỏi hệ thống | ✅ |
+| `POST` | `/api/auth/register` | Đăng ký tài khoản mới | ❌ |
+| `POST` | `/api/auth/login` | Đăng nhập và nhận JWT Token | ❌ |
+| `GET` | `/api/users` | Lấy danh sách toàn bộ người dùng (Admin) | ✅ |
+| `GET` | `/api/users/:id` | Xem thông tin chi tiết người dùng | ✅ |
+| `PATCH` | `/api/users/:id` | Cập nhật thông tin / phân quyền người dùng | ✅ |
+| `DELETE` | `/api/users/:id` | Xóa người dùng | ✅ |
 
-### 2. Quản lý Phòng (`/api/rooms`)
-| Phương thức | Endpoint | Mô tả | Yêu cầu xác thực |
+### 2. Room Catalog Service (`/api/rooms`)
+| Phương thức | Endpoint | Mô tả | Xác thực JWT |
 |:---|:---|:---|:---:|
-| `GET` | `/api/rooms` | Lấy danh sách phòng (hỗ trợ query `?type=...`) | ❌ |
-| `GET` | `/api/rooms/price` | Lọc phòng theo tầm giá (`?min=...&max=...`) | ❌ |
-| `GET` | `/api/rooms/:id` | Xem chi tiết thông tin một phòng | ❌ |
-| `GET` | `/api/rooms/:id/availability`| Kiểm tra tình trạng phòng còn trống hay không | ❌ |
+| `GET` | `/api/rooms` | Lấy danh sách phòng (hỗ trợ lọc `?type=...`) | ❌ |
+| `GET` | `/api/rooms/price` | Lọc phòng theo khoảng giá (`?min=...&max=...`) | ❌ |
+| `GET` | `/api/rooms/:id` | Xem chi tiết thông tin phòng | ❌ |
+| `GET` | `/api/rooms/:id/availability`| Kiểm tra phòng trống và lấy đơn giá | ❌ |
 | `POST` | `/api/rooms` | Thêm phòng mới (Admin) | ✅ |
 | `PATCH` | `/api/rooms/:id` | Cập nhật thông tin phòng (Admin) | ✅ |
-| `PATCH` | `/api/rooms/:id/toggle-availability` | Chuyển đổi trạng thái khả dụng của phòng | ✅ |
+| `PATCH` | `/api/rooms/:id/toggle-availability` | Đổi trạng thái phòng trống / đã đặt | ✅ |
 | `DELETE` | `/api/rooms/:id` | Xóa phòng (Admin) | ✅ |
 
-### 3. Quản lý Đặt phòng (`/api/bookings`)
-| Phương thức | Endpoint | Mô tả | Yêu cầu xác thực |
+### 3. Booking Service (`/api/bookings`)
+| Phương thức | Endpoint | Mô tả | Xác thực JWT |
 |:---|:---|:---|:---:|
-| `GET` | `/api/bookings` | Xem toàn bộ danh sách đơn đặt phòng (Admin) | ✅ |
-| `POST` | `/api/bookings` | Tạo đơn đặt phòng mới | ✅ |
-| `GET` | `/api/bookings/user/:userId` | Xem lịch sử đặt phòng của một khách hàng | ✅ |
-| `GET` | `/api/bookings/:id` | Xem chi tiết một đơn đặt phòng | ✅ |
-| `PATCH` | `/api/bookings/:id/confirm` | Phê duyệt đơn đặt phòng (Admin) | ✅ |
+| `GET` | `/api/bookings` | Lấy tất cả đơn đặt phòng toàn hệ thống (Admin) | ✅ |
+| `POST` | `/api/bookings` | Đặt phòng mới theo ngày | ✅ |
+| `GET` | `/api/bookings/user/:userId` | Xem lịch sử đặt phòng của người dùng | ✅ |
+| `GET` | `/api/bookings/:id` | Xem chi tiết đơn đặt phòng | ✅ |
+| `PATCH` | `/api/bookings/:id/confirm` | Xác nhận đơn đặt phòng (Admin) | ✅ |
 | `PATCH` | `/api/bookings/:id/cancel` | Hủy đơn đặt phòng | ✅ |
-| `PATCH` | `/api/bookings/:id/status` | Cập nhật trạng thái đơn đặt (gọi nội bộ) | ✅ |
+| `PATCH` | `/api/bookings/:id/status` | Cập nhật trạng thái đơn đặt phòng | ✅ |
 
-### 4. Thanh toán & Voucher (`/api/payments`, `/api/vouchers`)
-| Phương thức | Endpoint | Mô tả | Yêu cầu xác thực |
+### 4. Payment & Notification Service (`/api/payments`, `/api/vouchers`)
+| Phương thức | Endpoint | Mô tả | Xác thực JWT |
 |:---|:---|:---|:---:|
-| `POST` | `/api/payments` | Khởi tạo giao dịch thanh toán (MoMo Sandbox / Thẻ) | ✅ |
-| `POST` | `/api/payments/momo/ipn` | Webhook tiếp nhận callback từ MoMo | ❌ |
-| `GET` | `/api/payments` | Lấy danh sách các giao dịch thanh toán (Admin) | ✅ |
-| `GET` | `/api/payments/stats/summary`| Thống kê tổng hợp doanh thu và số lượng giao dịch | ✅ |
-| `GET` | `/api/payments/booking/:bookingId` | Tìm giao dịch theo mã đơn đặt phòng | ✅ |
-| `GET` | `/api/payments/user/:userId` | Lấy danh sách giao dịch theo khách hàng | ✅ |
-| `POST` | `/api/payments/:id/refund` | Yêu cầu hoàn tiền giao dịch | ✅ |
+| `POST` | `/api/payments` | Khởi tạo giao dịch thanh toán (giả lập) | ✅ |
+| `POST` | `/api/payments/momo/ipn` | Nhận kết quả callback thanh toán MoMo | ❌ |
+| `GET` | `/api/payments` | Xem danh sách giao dịch thanh toán | ✅ |
+| `GET` | `/api/payments/stats/summary`| Thống kê doanh thu và số lượng giao dịch | ✅ |
+| `GET` | `/api/payments/booking/:bookingId` | Tra cứu thanh toán theo mã đặt phòng | ✅ |
+| `GET` | `/api/payments/user/:userId` | Lịch sử giao dịch của người dùng | ✅ |
+| `POST` | `/api/payments/:id/refund` | Hoàn tiền giao dịch | ✅ |
 | `POST` | `/api/vouchers/apply` | Kiểm tra và áp dụng mã giảm giá | ✅ |
 
-### 5. Đánh giá & Nhận xét (`/api/reviews`)
-| Phương thức | Endpoint | Mô tả | Yêu cầu xác thực |
+### 5. Review Service (`/api/reviews`)
+| Phương thức | Endpoint | Mô tả | Xác thực JWT |
 |:---|:---|:---|:---:|
-| `POST` | `/api/reviews` | Gửi bài đánh giá cho phòng | ✅ |
-| `GET` | `/api/reviews/room/:roomId` | Xem danh sách đánh giá của một phòng | ❌ |
-| `GET` | `/api/reviews/:id` | Xem chi tiết một bài đánh giá | ❌ |
-| `DELETE` | `/api/reviews/:id` | Xóa bài đánh giá vi phạm (Admin) | ✅ |
+| `POST` | `/api/reviews` | Gửi đánh giá phòng | ✅ |
+| `GET` | `/api/reviews/room/:roomId` | Xem danh sách đánh giá theo phòng | ❌ |
+| `GET` | `/api/reviews/:id` | Xem chi tiết một đánh giá | ❌ |
+| `DELETE` | `/api/reviews/:id` | Xóa đánh giá (Admin) | ✅ |
 
 ---
 
 ## 🌿 Git Workflow
 
-Dự án áp dụng mô hình **Feature Branch Workflow** giúp các thành viên phát triển song song, giảm thiểu xung đột mã nguồn:
-
-### 1. Quy ước đặt tên nhánh (Branch Naming)
-```
-feat/<ten-service-hoac-tinh-nang>
-```
-Ví dụ:
-- `feat/api-gateway`
-- `feat/user-auth`
-- `feat/room-catalog`
-- `feat/booking-service`
-- `feat/payment-notification`
-
-### 2. Quy ước Commit Messages (Conventional Commits)
-| Tiền tố | Ý nghĩa | Ví dụ |
-|:---|:---|:---|
-| `feat:` | Phát triển tính năng mới | `feat(payment): integrate MoMo sandbox payment flow` |
-| `fix:` | Sửa lỗi hệ thống | `fix(auth): resolve JWT expiration token verification` |
-| `docs:` | Cập nhật tài liệu kỹ thuật | `docs: update system architecture and api endpoints` |
-| `refactor:` | Tái cấu trúc mã nguồn | `refactor(booking): optimize room availability check query` |
-| `chore:` | Thiết lập cấu hình / Docker | `chore: update docker-compose services healthcheck` |
+Dự án áp dụng **Feature Branch Workflow** theo từng phân hệ Microservice:
+- `feat/api-gateway` — **Trương Văn Phong** (API Gateway, Integration & Review Service)
+- `feat/user-auth` — **Bùi Đại Dương** (User & Auth Service)
+- `feat/booking-service` — **Trần Đức Hải** (Booking Service)
+- `feat/room-catalog` — **Nguyễn Thành Hưng** (Room Catalog Service)
+- `feat/payment-notification` — **Đậu Ngọc Anh** (Payment & Notification Service)
 
 ---
 
 ## 📐 Quyết định thiết kế kiến trúc
 
-| # | Khía cạnh | Quyết định kỹ thuật | Rationale (Lý do lựa chọn) |
+| # | Khía cạnh | Quyết định kỹ thuật | Lý do lựa chọn (Rationale) |
 |:---:|:---|:---|:---|
-| **1** | **Giao tiếp giữa các services** | REST API đồng bộ & HTTP Service | Trực quan, dễ theo dõi, phù hợp quy mô dự án nghiên cứu microservices thực chiến. |
-| **2** | **Kênh Chat CSKH** | WebSocket (Socket.io) | Truyền tải tin nhắn hai chiều tốc độ cao, độ trễ thấp và tích hợp mượt mà với React. |
-| **3** | **Cơ sở dữ liệu** | Database-per-service (MySQL 8.0) | Đảm bảo tính độc lập tuyệt đối giữa các services; nếu 1 service gặp sự cố, các service khác vẫn hoạt động ổn định. |
-| **4** | **Cơ chế xác thực** | Stateless JWT (Json Web Token) | Không cần chia sẻ session giữa các service, dễ dàng scale theo chiều ngang. |
-| **5** | **Xử lý giao dịch phân tán** | Compensating Action | Nếu giao dịch thanh toán thất bại, trạng thái booking tự động chuyển sang `FAILED` hoặc hoàn tiền để đảm bảo tính nhất quán dữ liệu. |
+| **1** | **Tách biệt dữ liệu** | **Database-per-Service** (5 DB MySQL riêng) | Đảm bảo tính độc lập dữ liệu (Loose Coupling) giữa các Microservices; một service không thể truy cập trực tiếp bảng của service khác. |
+| **2** | **Giao tiếp giữa các Service** | **REST API (HTTP)** | Dễ triển khai, dễ kiểm thử và minh bạch trong luồng gọi liên dịch vụ (Booking ↔ Room, Booking ↔ Payment). |
+| **3** | **Điểm truy cập tập trung** | **API Gateway Pattern** | Frontend chỉ cần giao tiếp với một địa chỉ duy nhất (`:3000`), giúp ẩn cấu trúc mạng nội bộ và kiểm soát xác thực JWT tập trung. |
+| **4** | **Cơ chế xác thực** | **Stateless JWT** | Không lưu trữ session trên server, giúp các Microservices xác thực nhanh và dễ dàng mở rộng (scale). |
 
 ---
 
 <p align="center">
-  Đồ án kiến trúc Microservices - Được xây dựng với ❤️ bởi <strong>Group 10</strong>
+  Đồ án Xây dựng hệ thống đặt phòng khách sạn BookingHotel theo kiến trúc Microservices — Thực hiện bởi <strong>Nhóm 10</strong>
 </p>
