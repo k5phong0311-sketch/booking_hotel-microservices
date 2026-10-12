@@ -65,11 +65,11 @@ const PaymentCallbackPage: React.FC = () => {
               </p>
             )}
             <div style={{ textAlign: 'left', background: '#f8f9fa', padding: 14, borderRadius: 8, fontSize: 13, color: '#333', marginBottom: 16, border: '1px solid #e0e0e0' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: 6, color: '#d82d8b' }}>📌 Lưu ý bộ thẻ Test chuẩn của MoMo Sandbox:</div>
-              <div>• Số thẻ: <strong>4111111111111111</strong> (hoặc <strong>5200000000001096</strong>)</div>
-              <div>• Ngày hết hạn (MM/YY): <strong>05/26</strong></div>
+              <div style={{ fontWeight: 'bold', marginBottom: 6, color: '#d82d8b' }}>📌 Lưu ý bộ thẻ ATM nội địa Napas Test chuẩn:</div>
+              <div>• Số thẻ Napas: <strong>9704000000000018</strong></div>
+              <div>• Ngày phát hành (MM/YY): <strong>03/07</strong></div>
               <div>• Tên chủ thẻ: <strong>NGUYEN VAN A</strong></div>
-              <div>• Số CVC: <strong>111</strong> | SĐT: <strong>0901234567</strong></div>
+              <div>• Mã OTP: <strong>123456</strong> (hoặc <strong>OTP</strong>)</div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {paymentId && (

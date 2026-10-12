@@ -14,6 +14,7 @@ import BookingPage from './pages/BookingPage';
 import MyBookingsPage from './pages/MyBookingsPage';
 import ProfilePage from './pages/ProfilePage';
 import PaymentCallbackPage from './pages/PaymentCallbackPage';
+import MomoAtmGatewayPage from './pages/MomoAtmGatewayPage';
 import ChatWidget from './components/ChatWidget';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 
@@ -43,6 +44,9 @@ const App: React.FC = () => {
           } />
           <Route path="/admin" element={
             <PrivateRoute><AdminDashboardPage /></PrivateRoute>
+          } />
+          <Route path="/payment/momo-atm" element={
+            <MomoAtmGatewayPage />
           } />
           <Route path="/payment/callback" element={
             <PaymentCallbackPage />

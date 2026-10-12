@@ -25,21 +25,22 @@ export class PaymentsController {
   async create(@Body() dto: CreatePaymentDto) {
     const payment = await this.paymentsService.create(dto);
 
-    // Nếu chọn MOMO, gọi API tạo giao dịch MoMo
+    // Nếu chọn MOMO, gọi API tạo giao dịch MoMo (payWithATM) và điều hướng tới cổng thanh toán thẻ ATM nội địa Napas
     if (dto.method === PaymentMethod.MOMO) {
+      let orderCode = `${payment.id}_${Date.now()}`;
       try {
         const momoResult = await this.momoService.createPayment(payment.id, Number(payment.amount));
-        return {
-          payment,
-          momoUrl: momoResult.payUrl || `http://localhost:5173/payment/callback?orderId=${payment.id}&resultCode=0&message=Success`,
-        };
+        if (momoResult?.orderId) {
+          orderCode = momoResult.orderId;
+        }
       } catch (err) {
-        // Fallback mock url if real API fails
-        return {
-          payment,
-          momoUrl: `http://localhost:5173/payment/callback?orderId=${payment.id}&resultCode=0&message=Mocked_Success`,
-        };
+        // Fallback nếu MoMo sandbox không phản hồi
       }
+      const orderInfo = encodeURIComponent(`Thanh toan don hang #${payment.id}`);
+      return {
+        payment,
+        momoUrl: `http://localhost:5173/payment/momo-atm?orderId=${payment.id}&orderCode=${orderCode}&amount=${Number(payment.amount)}&orderInfo=${orderInfo}`,
+      };
     }
 
     return { payment };
