@@ -15,7 +15,12 @@ export class VoucherController {
   @Post('apply')
   @HttpCode(200)
   async apply(@Body() body: { code: string }) {
-    await this.voucherService.applyVoucher(body.code);
-    return { message: 'Áp dụng Voucher thành công!' };
+    const voucher = await this.voucherService.applyVoucher(body.code);
+    return {
+      message: 'Áp dụng Voucher thành công!',
+      code: voucher.code,
+      discountPercentage: voucher.discountPercentage,
+    };
   }
 }
+

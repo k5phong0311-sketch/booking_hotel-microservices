@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { roomService } from '../services/room.service';
 import { bookingService } from '../services/booking.service';
 import { paymentService } from '../services/payment.service';
+import api from '../services/api';
 import { Room } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 
@@ -54,13 +55,24 @@ const BookingPage: React.FC = () => {
   const finalTotal = rawTotal > discount ? rawTotal - discount : 0;
   const deposit = finalTotal * 0.3;
 
-  const handleApplyVoucher = () => {
-    if (voucher.toUpperCase() === 'KM100') {
-      setDiscount(100000);
-      alert('\u00c1p d\u1ee5ng m\u00e3 gi\u1ea3m gi\u00e1 100k th\u00e0nh c\u00f4ng!');
-    } else {
-      setDiscount(0);
-      alert('M\u00e3 kh\u00f4ng h\u1ee3p l\u1ec7');
+  const handleApplyVoucher = async () => {
+    const code = voucher.trim().toUpperCase();
+    if (!code) return;
+    try {
+      const res = await api.post('/vouchers/apply', { code });
+      const pct = Number(res.data?.discountPercentage) || 10;
+      const baseAmount = rawTotal > 0 ? rawTotal : Number(room?.pricePerNight || 0);
+      const calcDiscount = Math.round((baseAmount * pct) / 100);
+      setDiscount(calcDiscount);
+      alert(`Áp dụng mã ${code} (-${pct}%) thành công! Giảm ${calcDiscount.toLocaleString('vi-VN')} VND`);
+    } catch (err: any) {
+      if (code === 'KM100') {
+        setDiscount(100000);
+        alert('Áp dụng mã giảm giá 100k thành công!');
+      } else {
+        setDiscount(0);
+        alert(err.response?.data?.message || 'Mã khuyến mãi không hợp lệ hoặc đã hết lượt');
+      }
     }
   };
 

@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { roomService } from '../services/room.service';
 import { bookingService } from '../services/booking.service';
 import { userService } from '../services/user.service';
+import api from '../services/api';
 import { Room, Booking, User } from '../types';
 
 const initialRevenueData = [
@@ -31,8 +32,8 @@ const AdminDashboardPage: React.FC = () => {
   
   // Voucher state
   const [voucherCode, setVoucherCode] = useState('');
-  const [voucherValue, setVoucherValue] = useState(0);
-  const [quantity, setQuantity] = useState(0);
+  const [voucherValue, setVoucherValue] = useState(10);
+  const [quantity, setQuantity] = useState(50);
   const [statusMsg, setStatusMsg] = useState('');
 
   // Chat State
@@ -65,24 +66,32 @@ const AdminDashboardPage: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      const roomsData = await roomService.getAll();
-      setRooms(roomsData);
-      
-      const bookingsData = await bookingService.getAllBookings();
-      setBookings(bookingsData);
-
-      setUsers([
-        { id: 1, email: 'admin@bookinghotel.com', role: 'ADMIN', fullName: 'Trường Văn Phong', createdAt: new Date().toISOString() },
-        { id: 2, email: 'customer@test.com', role: 'CUSTOMER', fullName: 'Nguyễn Văn Khách', createdAt: new Date().toISOString() }
+      const [roomsData, bookingsData, usersData] = await Promise.all([
+        roomService.getAll().catch(() => []),
+        bookingService.getAllBookings().catch(() => []),
+        userService.getAll().catch(() => []),
       ]);
+      setRooms(roomsData);
+      setBookings(bookingsData);
+      setUsers(usersData);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleBroadcastVoucher = (e: React.FormEvent) => {
+  const handleBroadcastVoucher = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatusMsg(`Đã phát hành mã ${voucherCode} (-${voucherValue}%). Số lượng: ${quantity}`);
+    try {
+      await api.post('/vouchers/broadcast', {
+        code: voucherCode.trim().toUpperCase(),
+        discount: Number(voucherValue),
+        quantity: Number(quantity),
+      });
+      setStatusMsg(`Đã phát hành mã ${voucherCode.toUpperCase()} (-${voucherValue}%). Số lượng: ${quantity}`);
+      setVoucherCode('');
+    } catch (err: any) {
+      setStatusMsg(err.response?.data?.message || 'Không thể phát hành mã giảm giá (có thể mã đã tồn tại).');
+    }
   };
 
   const handleSendReply = (e: React.FormEvent) => {
@@ -97,7 +106,7 @@ const AdminDashboardPage: React.FC = () => {
     e.preventDefault();
     try {
       if (editingRoom.id) {
-        // update placeholder
+        await roomService.updateRoom(editingRoom.id, editingRoom);
       } else {
         await roomService.createRoom(editingRoom);
       }
@@ -109,6 +118,34 @@ const AdminDashboardPage: React.FC = () => {
     }
   };
 
+  const handleToggleRoomAvailability = async (id: number) => {
+    try {
+      await roomService.toggleAvailability(id);
+      fetchData();
+    } catch {
+      alert('Không thể đổi trạng thái phòng');
+    }
+  };
+
+  const handleToggleUserRole = async (u: User) => {
+    const newRole = u.role === 'ADMIN' ? 'CUSTOMER' : 'ADMIN';
+    try {
+      await userService.updateRole(u.id, newRole);
+      fetchData();
+    } catch {
+      alert('Không thể cập nhật quyền người dùng');
+    }
+  };
+
+  const handleDeleteUser = async (id: number) => {
+    if (!confirm('Bạn có chắc chắn muốn xóa người dùng này?')) return;
+    try {
+      await userService.deleteUser(id);
+      fetchData();
+    } catch {
+      alert('Không thể xóa người dùng');
+    }
+  };
 
   const handleConfirmBooking = async (id: number) => {
     try {
@@ -223,13 +260,17 @@ const AdminDashboardPage: React.FC = () => {
                   <td className="px-6 py-4"><span className="px-3 py-1 bg-gray-100 rounded-full text-xs font-bold">{room.type}</span></td>
                   <td className="px-6 py-4 text-brand-DEFAULT font-bold">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(room.pricePerNight)}</td>
                   <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${room.isAvailable ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    <button
+                      onClick={() => handleToggleRoomAvailability(room.id)}
+                      title="Nhấn để đổi trạng thái phòng"
+                      className={`px-3 py-1 rounded-full text-xs font-bold cursor-pointer transition ${room.isAvailable ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-red-100 text-red-700 hover:bg-red-200'}`}
+                    >
                       {room.isAvailable ? 'Còn trống' : 'Đã đặt'}
-                    </span>
+                    </button>
                   </td>
-                  <td className="px-6 py-4 flex space-x-2">
-                    <button className="text-blue-600 font-bold text-sm">Sửa</button>
-                    <button onClick={() => handleDeleteRoom(room.id)} className="text-red-600 font-bold text-sm">Xóa</button>
+                  <td className="px-6 py-4 flex space-x-3">
+                    <button onClick={() => { setEditingRoom(room); setShowRoomModal(true); }} className="text-blue-600 hover:underline font-bold text-sm">Sửa</button>
+                    <button onClick={() => handleDeleteRoom(room.id)} className="text-red-600 hover:underline font-bold text-sm">Xóa</button>
                   </td>
                 </tr>
               ))}
@@ -300,6 +341,7 @@ const AdminDashboardPage: React.FC = () => {
                 <th className="px-6 py-4 font-bold text-gray-900">Ngày đặt</th>
                 <th className="px-6 py-4 font-bold text-gray-900">Tổng tiền</th>
                 <th className="px-6 py-4 font-bold text-gray-900">Trạng thái</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Hành động</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -342,6 +384,7 @@ const AdminDashboardPage: React.FC = () => {
                 <th className="px-6 py-4 font-bold text-gray-900">Tên người dùng</th>
                 <th className="px-6 py-4 font-bold text-gray-900">Email</th>
                 <th className="px-6 py-4 font-bold text-gray-900">Vai trò</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Hành động</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -355,7 +398,20 @@ const AdminDashboardPage: React.FC = () => {
                       {u.role}
                     </span>
                   </td>
-
+                  <td className="px-6 py-4 flex space-x-3">
+                    <button
+                      onClick={() => handleToggleUserRole(u)}
+                      className="text-blue-600 hover:underline font-bold text-sm"
+                    >
+                      Đổi quyền ({u.role === 'ADMIN' ? 'CUSTOMER' : 'ADMIN'})
+                    </button>
+                    <button
+                      onClick={() => handleDeleteUser(u.id)}
+                      className="text-red-600 hover:underline font-bold text-sm"
+                    >
+                      Xóa
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

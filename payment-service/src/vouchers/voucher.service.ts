@@ -23,7 +23,7 @@ export class VoucherService {
   }
 
   // Khách hàng apply Voucher lúc thanh toán
-  async applyVoucher(code: string): Promise<boolean> {
+  async applyVoucher(code: string): Promise<Voucher> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('READ COMMITTED'); // Pessimistic Lock
@@ -51,7 +51,7 @@ export class VoucherService {
       
       await queryRunner.commitTransaction();
       this.logger.log(`Voucher ${code} applied. Remaining: ${voucher.quantity - voucher.usedCount}`);
-      return true;
+      return voucher;
 
     } catch (err) {
       await queryRunner.rollbackTransaction();

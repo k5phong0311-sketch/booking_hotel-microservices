@@ -32,4 +32,15 @@ export class ProxyController {
   async proxyPayments(@Req() req: Request, @Res() res: Response) {
     return this.proxyService.forward(req, res, process.env.PAYMENT_SERVICE_URL);
   }
+
+  @All(['vouchers', 'vouchers/*'])
+  async proxyVouchers(@Req() req: Request, @Res() res: Response) {
+    return this.proxyService.forward(req, res, process.env.PAYMENT_SERVICE_URL);
+  }
+
+  @All(['notifications', 'notifications/*'])
+  async proxyNotifications(@Req() req: Request, @Res() res: Response) {
+    return this.proxyService.forward(req, res, process.env.PAYMENT_SERVICE_URL);
+  }
 }
+

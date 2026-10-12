@@ -22,8 +22,19 @@ export const roomService = {
     return res.data;
   },
 
+  updateRoom: async (id: number, roomData: Partial<Room>) => {
+    const res = await api.patch(`/rooms/${id}`, roomData);
+    return res.data;
+  },
+
+  toggleAvailability: async (id: number) => {
+    const res = await api.patch(`/rooms/${id}/toggle-availability`);
+    return res.data;
+  },
+
   deleteRoom: async (id: number) => {
     const res = await api.delete(`/rooms/${id}`);
     return res.data;
   }
 };
+
