@@ -130,12 +130,12 @@ const Navbar: React.FC = () => {
                 )}
               </div>
 
-              <div className="flex items-center gap-3">
+              <Link to="/profile" title="Hồ sơ cá nhân" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                 <div className="w-8 h-8 rounded-full bg-brand-light flex items-center justify-center text-brand-dark font-medium">
                   {user?.fullName?.charAt(0).toUpperCase() || 'U'}
                 </div>
-                <span className="text-sm font-medium text-gray-900">{user?.fullName}</span>
-              </div>
+                <span className="text-sm font-medium text-gray-900 hover:text-brand-dark">{user?.fullName}</span>
+              </Link>
               <button 
                 onClick={handleLogout} 
                 className="text-sm font-medium text-red-500 hover:text-red-700 transition-colors"

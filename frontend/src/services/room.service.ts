@@ -35,6 +35,11 @@ export const roomService = {
   deleteRoom: async (id: number) => {
     const res = await api.delete(`/rooms/${id}`);
     return res.data;
+  },
+
+  getByPriceRange: async (min: number, max: number): Promise<Room[]> => {
+    const res = await api.get<Room[]>(`/rooms/price?min=${min}&max=${max}`);
+    return res.data;
   }
 };
 

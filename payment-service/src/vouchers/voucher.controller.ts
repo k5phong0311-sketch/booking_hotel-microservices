@@ -1,9 +1,14 @@
-import { Controller, Post, Body, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, HttpCode, ParseIntPipe } from '@nestjs/common';
 import { VoucherService } from './voucher.service';
 
 @Controller('vouchers')
 export class VoucherController {
   constructor(private readonly voucherService: VoucherService) {}
+
+  @Get()
+  async findAll() {
+    return this.voucherService.findAll();
+  }
 
   @Post('broadcast')
   @HttpCode(201)
@@ -21,6 +26,11 @@ export class VoucherController {
       code: voucher.code,
       discountPercentage: voucher.discountPercentage,
     };
+  }
+
+  @Delete(':id')
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return this.voucherService.remove(id);
   }
 }
 

@@ -13,11 +13,29 @@ export class VoucherService {
     private readonly dataSource: DataSource,
   ) {}
 
+  async findAll(): Promise<Voucher[]> {
+    return this.voucherRepo.find({ order: { id: 'DESC' } });
+  }
+
+  async remove(id: number): Promise<{ message: string }> {
+    const voucher = await this.voucherRepo.findOne({ where: { id } });
+    if (!voucher) {
+      throw new HttpException('Voucher không tồn tại', HttpStatus.NOT_FOUND);
+    }
+    await this.voucherRepo.remove(voucher);
+    return { message: `Đã xóa mã giảm giá ${voucher.code}` };
+  }
+
   async createBroadcast(code: string, discountPercentage: number, quantity: number): Promise<Voucher> {
+    const existing = await this.voucherRepo.findOne({ where: { code } });
+    if (existing) {
+      existing.discountPercentage = discountPercentage;
+      existing.quantity = quantity;
+      return this.voucherRepo.save(existing);
+    }
     const voucher = this.voucherRepo.create({ code, discountPercentage, quantity });
     const saved = await this.voucherRepo.save(voucher);
     
-    // TODO: Gửi Notification tới tất cả user thông qua NotificationService hoặc Gateway
     this.logger.log(`[BROADCAST] Đã phát hành ${quantity} Voucher ${code} (-${discountPercentage}%)`);
     return saved;
   }

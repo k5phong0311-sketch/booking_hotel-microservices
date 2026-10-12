@@ -18,12 +18,43 @@ const initialRevenueData = [
   { name: 'Sun', revenue: 9500000 },
 ];
 
+interface VoucherAdminItem {
+  id: number;
+  code: string;
+  discountPercentage: number;
+  quantity: number;
+  usedCount: number;
+}
+
+interface PaymentAdminItem {
+  id: number;
+  bookingId: number;
+  userId: number;
+  amount: number;
+  method: string;
+  status: string;
+  transactionId?: string;
+  refundAmount?: number;
+  createdAt: string;
+}
+
+interface PaymentStatsSummary {
+  totalTransactions: number;
+  totalRevenue: number;
+  totalRefunded: number;
+  netRevenue: number;
+  byStatus: Record<string, number>;
+}
+
 const AdminDashboardPage: React.FC = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'overview' | 'rooms' | 'bookings' | 'users' | 'chat'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'rooms' | 'bookings' | 'payments' | 'users' | 'chat'>('overview');
   const [rooms, setRooms] = useState<Room[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [vouchers, setVouchers] = useState<VoucherAdminItem[]>([]);
+  const [payments, setPayments] = useState<PaymentAdminItem[]>([]);
+  const [paymentStats, setPaymentStats] = useState<PaymentStatsSummary | null>(null);
   const [revenueData] = useState<{name: string, revenue: number}[]>(initialRevenueData);
 
   // Room Management State
@@ -66,14 +97,20 @@ const AdminDashboardPage: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      const [roomsData, bookingsData, usersData] = await Promise.all([
+      const [roomsData, bookingsData, usersData, vouchersRes, paymentsRes, statsRes] = await Promise.all([
         roomService.getAll().catch(() => []),
         bookingService.getAllBookings().catch(() => []),
         userService.getAll().catch(() => []),
+        api.get<VoucherAdminItem[]>('/vouchers').catch(() => ({ data: [] })),
+        api.get<{ data: PaymentAdminItem[] }>('/payments?limit=50').catch(() => ({ data: { data: [] } })),
+        api.get<PaymentStatsSummary>('/payments/stats/summary').catch(() => ({ data: null })),
       ]);
       setRooms(roomsData);
       setBookings(bookingsData);
       setUsers(usersData);
+      setVouchers(Array.isArray(vouchersRes.data) ? vouchersRes.data : []);
+      setPayments(paymentsRes.data?.data || []);
+      if (statsRes.data) setPaymentStats(statsRes.data);
     } catch (err) {
       console.error(err);
     }
@@ -89,8 +126,40 @@ const AdminDashboardPage: React.FC = () => {
       });
       setStatusMsg(`Đã phát hành mã ${voucherCode.toUpperCase()} (-${voucherValue}%). Số lượng: ${quantity}`);
       setVoucherCode('');
+      fetchData();
     } catch (err: any) {
-      setStatusMsg(err.response?.data?.message || 'Không thể phát hành mã giảm giá (có thể mã đã tồn tại).');
+      setStatusMsg(err.response?.data?.message || 'Không thể phát hành mã giảm giá.');
+    }
+  };
+
+  const handleDeleteVoucher = async (id: number) => {
+    if (!confirm('Bạn muốn xóa mã giảm giá này?')) return;
+    try {
+      await api.delete(`/vouchers/${id}`);
+      fetchData();
+    } catch {
+      alert('Không thể xóa mã giảm giá');
+    }
+  };
+
+  const handleRefundPayment = async (payment: PaymentAdminItem) => {
+    const reason = prompt('Nhập lý do hoàn tiền:', 'Khách yêu cầu hủy phòng / Hoàn tiền theo chính sách');
+    if (reason === null) return;
+    try {
+      await api.post(`/payments/${payment.id}/refund`, { reason });
+      fetchData();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Không thể hoàn tiền giao dịch');
+    }
+  };
+
+  const handleCancelPayment = async (payment: PaymentAdminItem) => {
+    if (!confirm(`Hủy giao dịch thanh toán #${payment.id}?`)) return;
+    try {
+      await api.post(`/payments/${payment.id}/cancel`, { reason: 'Admin hủy giao dịch chờ' });
+      fetchData();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Không thể hủy giao dịch');
     }
   };
 
@@ -175,61 +244,134 @@ const AdminDashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-24">
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-serif font-bold text-gray-900 mb-2">Bảng Điều Khiển Quản Trị</h1>
-          <p className="text-gray-500">Quản lý phòng, đơn đặt, người dùng và hỗ trợ khách hàng.</p>
+          <p className="text-gray-500">Quản lý phòng, đơn đặt, giao dịch thanh toán, voucher, người dùng và hỗ trợ khách hàng.</p>
         </div>
       </div>
 
       <div className="flex space-x-2 mb-8 bg-white p-2 rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
-        <button onClick={() => setActiveTab('overview')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'overview' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>Tổng quan</button>
-        <button onClick={() => setActiveTab('rooms')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'rooms' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>Phòng</button>
-        <button onClick={() => setActiveTab('bookings')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'bookings' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>Đơn đặt</button>
-        <button onClick={() => setActiveTab('users')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'users' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>Người dùng</button>
+        <button onClick={() => setActiveTab('overview')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'overview' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>Tổng quan & Voucher</button>
+        <button onClick={() => setActiveTab('rooms')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'rooms' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>Phòng ({rooms.length})</button>
+        <button onClick={() => setActiveTab('bookings')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'bookings' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>Đơn đặt ({bookings.length})</button>
+        <button onClick={() => setActiveTab('payments')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'payments' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>Thanh toán ({payments.length})</button>
+        <button onClick={() => setActiveTab('users')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'users' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>Người dùng ({users.length})</button>
         <button onClick={() => setActiveTab('chat')} className={`px-6 py-2.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${activeTab === 'chat' ? 'bg-brand-dark text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}>Hỗ trợ (Chat)</button>
       </div>
 
       {activeTab === 'overview' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900 mb-6">Doanh thu 7 ngày</h3>
-              <div className="h-72 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={revenueData}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                    <YAxis tickFormatter={(value) => `${value / 1000000}M`} axisLine={false} tickLine={false} />
-                    <Tooltip formatter={(value: number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)} />
-                    <Bar dataKey="revenue" fill="#1E3A8A" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+        <div className="space-y-8">
+          {/* KPI Cards từ GET /api/payments/stats/summary */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Doanh thu thực nhận</p>
+              <p className="text-2xl font-bold text-brand-dark">
+                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(paymentStats?.netRevenue || 0)}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">Tổng thu: {(paymentStats?.totalRevenue || 0).toLocaleString('vi-VN')}đ</p>
+            </div>
+            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Giao dịch thành công</p>
+              <p className="text-2xl font-bold text-green-600">{paymentStats?.byStatus?.SUCCESS || 0}</p>
+              <p className="text-xs text-gray-500 mt-1">Trên tổng {paymentStats?.totalTransactions || 0} giao dịch</p>
+            </div>
+            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Đang chờ thanh toán</p>
+              <p className="text-2xl font-bold text-amber-500">{paymentStats?.byStatus?.PENDING || 0}</p>
+              <p className="text-xs text-gray-500 mt-1">Tổng số đơn đặt: {bookings.length}</p>
+            </div>
+            <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Đã hoàn tiền (Refund)</p>
+              <p className="text-2xl font-bold text-red-500">
+                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(paymentStats?.totalRefunded || 0)}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">{paymentStats?.byStatus?.REFUNDED || 0} giao dịch hoàn tiền</p>
             </div>
           </div>
-          <div className="lg:col-span-1">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-brand-DEFAULT/20 bg-brand-light/30">
-              <h3 className="text-xl font-bold text-brand-dark mb-2">Chiến dịch Marketing</h3>
-              <form onSubmit={handleBroadcastVoucher} className="space-y-5">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Mã giảm giá</label>
-                  <input type="text" required value={voucherCode} onChange={e => setVoucherCode(e.target.value.toUpperCase())} className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none uppercase font-bold" />
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-lg font-bold text-gray-900 mb-6">Doanh thu 7 ngày</h3>
+                <div className="h-72 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={revenueData}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                      <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                      <YAxis tickFormatter={(value) => `${value / 1000000}M`} axisLine={false} tickLine={false} />
+                      <Tooltip formatter={(value: number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)} />
+                      <Bar dataKey="revenue" fill="#1E3A8A" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">Giảm giá (%)</label>
-                    <input type="number" required value={voucherValue} onChange={e => setVoucherValue(Number(e.target.value))} className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none" />
+              </div>
+
+              {/* Danh sách Mã giảm giá đã phát hành */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">🏷️ Danh sách Mã giảm giá đang hoạt động ({vouchers.length})</h3>
+                {vouchers.length === 0 ? (
+                  <p className="text-sm text-gray-500 italic">Chưa có mã giảm giá nào. Hãy phát hành mã ở khung bên phải.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                          <th className="px-4 py-3 font-bold text-gray-700">Mã Voucher</th>
+                          <th className="px-4 py-3 font-bold text-gray-700">Mức giảm</th>
+                          <th className="px-4 py-3 font-bold text-gray-700">Đã dùng / Tổng</th>
+                          <th className="px-4 py-3 font-bold text-gray-700">Còn lại</th>
+                          <th className="px-4 py-3 font-bold text-gray-700">Hành động</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {vouchers.map(v => (
+                          <tr key={v.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-3 font-mono font-bold text-brand-dark">{v.code}</td>
+                            <td className="px-4 py-3 font-bold text-green-600">-{v.discountPercentage}%</td>
+                            <td className="px-4 py-3">{v.usedCount} / {v.quantity}</td>
+                            <td className="px-4 py-3 font-semibold">{Math.max(0, v.quantity - v.usedCount)}</td>
+                            <td className="px-4 py-3">
+                              <button
+                                onClick={() => handleDeleteVoucher(v.id)}
+                                className="text-red-500 hover:underline font-bold text-xs cursor-pointer"
+                              >
+                                Xóa
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
+                )}
+              </div>
+            </div>
+
+            <div className="lg:col-span-1">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-brand-DEFAULT/20 bg-brand-light/30">
+                <h3 className="text-xl font-bold text-brand-dark mb-2">Chiến dịch Marketing</h3>
+                <p className="text-xs text-gray-500 mb-4">Phát hành hoặc cập nhật mã giảm giá cho khách đặt phòng.</p>
+                <form onSubmit={handleBroadcastVoucher} className="space-y-5">
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">Số lượng</label>
-                    <input type="number" required value={quantity} onChange={e => setQuantity(Number(e.target.value))} className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none" />
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Mã giảm giá</label>
+                    <input type="text" required placeholder="VD: SUMMER20" value={voucherCode} onChange={e => setVoucherCode(e.target.value.toUpperCase())} className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none uppercase font-bold" />
                   </div>
-                </div>
-                <button type="submit" className="w-full py-3 bg-brand-dark text-white rounded-lg font-bold mt-4">Phát hành</button>
-              </form>
-              {statusMsg && <div className="mt-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm">{statusMsg}</div>}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">Giảm giá (%)</label>
+                      <input type="number" min={1} max={100} required value={voucherValue} onChange={e => setVoucherValue(Number(e.target.value))} className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">Số lượng</label>
+                      <input type="number" min={1} required value={quantity} onChange={e => setQuantity(Number(e.target.value))} className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none" />
+                    </div>
+                  </div>
+                  <button type="submit" className="w-full py-3 bg-brand-dark text-white rounded-lg font-bold mt-4 cursor-pointer">Phát hành</button>
+                </form>
+                {statusMsg && <div className="mt-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm">{statusMsg}</div>}
+              </div>
             </div>
           </div>
         </div>
@@ -355,17 +497,82 @@ const AdminDashboardPage: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 text-brand-DEFAULT font-bold">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(b.totalPrice)}</td>
                   <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${b.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' : b.status === 'CANCELED' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${b.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' : (String(b.status) === 'CANCELED' || String(b.status) === 'CANCELLED') ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
                       {b.status}
                     </span>
                   </td>
 
                   <td className="px-6 py-4 flex space-x-2">
                     {b.status === 'PENDING' && (
-                      <button onClick={() => handleConfirmBooking(b.id)} className="text-green-600 font-bold text-sm">Xác nhận</button>
+                      <button onClick={() => handleConfirmBooking(b.id)} className="text-green-600 font-bold text-sm cursor-pointer">Xác nhận</button>
                     )}
-                    {b.status !== 'CANCELED' && (
-                      <button onClick={() => handleCancelBooking(b.id)} className="text-red-600 font-bold text-sm">Hủy</button>
+                    {String(b.status) !== 'CANCELED' && String(b.status) !== 'CANCELLED' && (
+                      <button onClick={() => handleCancelBooking(b.id)} className="text-red-600 font-bold text-sm cursor-pointer">Hủy</button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table></div>
+        </div>
+      )}
+
+      {activeTab === 'payments' && (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="overflow-x-auto"><table className="w-full text-left whitespace-nowrap">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-4 font-bold text-gray-900">ID</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Booking</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Khách hàng</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Số tiền</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Phương thức</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Trạng thái</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Thời gian</th>
+                <th className="px-6 py-4 font-bold text-gray-900">Hành động</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {payments.map(p => (
+                <tr key={p.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-gray-500">#{p.id}</td>
+                  <td className="px-6 py-4 font-bold text-gray-900">Đơn #{p.bookingId}</td>
+                  <td className="px-6 py-4">User #{p.userId}</td>
+                  <td className="px-6 py-4 text-brand-DEFAULT font-bold">
+                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(p.amount))}
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="px-2.5 py-1 bg-gray-100 rounded text-xs font-bold">{p.method}</span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                      p.status === 'SUCCESS' ? 'bg-green-100 text-green-700' :
+                      p.status === 'REFUNDED' ? 'bg-purple-100 text-purple-700' :
+                      p.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-red-100 text-red-700'
+                    }`}>
+                      {p.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-xs text-gray-500">
+                    {p.createdAt ? new Date(p.createdAt).toLocaleString('vi-VN') : '—'}
+                  </td>
+                  <td className="px-6 py-4 flex space-x-3">
+                    {p.status === 'SUCCESS' && (
+                      <button
+                        onClick={() => handleRefundPayment(p)}
+                        className="text-purple-600 hover:underline font-bold text-sm cursor-pointer"
+                      >
+                        Hoàn tiền (Refund)
+                      </button>
+                    )}
+                    {p.status === 'PENDING' && (
+                      <button
+                        onClick={() => handleCancelPayment(p)}
+                        className="text-red-600 hover:underline font-bold text-sm cursor-pointer"
+                      >
+                        Hủy giao dịch
+                      </button>
                     )}
                   </td>
                 </tr>

@@ -1,10 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 
 const ProfilePage: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, token, login, logout } = useAuth();
   const navigate = useNavigate();
+
+  const [editing, setEditing] = useState(false);
+  const [fullName, setFullName] = useState(user?.fullName || '');
+  const [phone, setPhone] = useState(user?.phone || '');
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState('');
 
   const handleLogout = () => {
     logout();
@@ -13,12 +20,34 @@ const ProfilePage: React.FC = () => {
 
   if (!user) return null;
 
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setMsg('');
+    try {
+      const res = await api.patch(`/users/${user.id}`, {
+        fullName: fullName.trim(),
+        phone: phone.trim(),
+      });
+      const updatedUser = { ...user, ...res.data, fullName: fullName.trim(), phone: phone.trim() };
+      if (token) {
+        login(token, updatedUser);
+      }
+      setEditing(false);
+      setMsg('✅ Đã cập nhật thông tin cá nhân thành công!');
+    } catch {
+      setMsg('❌ Không thể cập nhật thông tin cá nhân.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const fields = [
     { label: 'Họ và tên', value: user.fullName },
     { label: 'Email', value: user.email },
     { label: 'Số điện thoại', value: user.phone || '—' },
     { label: 'Vai trò', value: user.role === 'ADMIN' ? '👑 Admin' : '👤 Khách hàng' },
-    { label: 'Ngày tạo', value: new Date(user.createdAt).toLocaleDateString('vi-VN') },
+    { label: 'Ngày tạo', value: user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : '—' },
   ];
 
   return (
@@ -36,13 +65,66 @@ const ProfilePage: React.FC = () => {
 
           {/* Info */}
           <div style={styles.infoBlock}>
-            <h3 style={styles.sectionTitle}>Thông tin cá nhân</h3>
-            {fields.map(f => (
-              <div key={f.label} style={styles.row}>
-                <span style={styles.rowLabel}>{f.label}</span>
-                <span style={styles.rowValue}>{f.value}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Thông tin cá nhân</h3>
+              <button
+                type="button"
+                onClick={() => {
+                  setFullName(user.fullName);
+                  setPhone(user.phone || '');
+                  setEditing(!editing);
+                  setMsg('');
+                }}
+                style={{ background: 'none', border: 'none', color: '#e94560', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}
+              >
+                {editing ? 'Hủy' : '✏️ Chỉnh sửa'}
+              </button>
+            </div>
+
+            {msg && (
+              <div style={{ padding: '10px 12px', borderRadius: 8, background: msg.startsWith('✅') ? '#eafaf1' : '#fdecea', color: msg.startsWith('✅') ? '#27ae60' : '#c0392b', fontSize: 13, fontWeight: 600, marginBottom: 14 }}>
+                {msg}
               </div>
-            ))}
+            )}
+
+            {editing ? (
+              <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 4 }}>Họ và tên</label>
+                  <input
+                    type="text"
+                    required
+                    value={fullName}
+                    onChange={e => setFullName(e.target.value)}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #ddd', fontSize: 14, boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 4 }}>Số điện thoại</label>
+                  <input
+                    type="text"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    placeholder="Nhập số điện thoại..."
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #ddd', fontSize: 14, boxSizing: 'border-box' }}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  style={{ ...styles.primaryBtn, background: '#27ae60', marginTop: 4 }}
+                >
+                  {saving ? 'Đang lưu...' : '💾 Lưu thay đổi'}
+                </button>
+              </form>
+            ) : (
+              fields.map(f => (
+                <div key={f.label} style={styles.row}>
+                  <span style={styles.rowLabel}>{f.label}</span>
+                  <span style={styles.rowValue}>{f.value}</span>
+                </div>
+              ))
+            )}
           </div>
 
           {/* Actions */}
@@ -61,7 +143,7 @@ const ProfilePage: React.FC = () => {
 };
 
 const styles: Record<string, React.CSSProperties> = {
-  page: { background: '#f8f9fa', minHeight: '100vh', padding: '40px 20px' },
+  page: { background: '#f8f9fa', minHeight: '100vh', padding: '100px 20px 40px' },
   container: { maxWidth: 520, margin: '0 auto' },
   card: { background: '#fff', borderRadius: 16, overflow: 'hidden',
     boxShadow: '0 8px 32px rgba(0,0,0,0.1)' },
